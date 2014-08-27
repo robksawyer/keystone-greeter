@@ -47,17 +47,20 @@ keystone.set('signin url','/my_path'),
 
 ```
 
-Change the default email and username values  before calling `greeter.add`:
+Change the default text values  before calling `greeter.add`:
 
 ```javascript
-greeter.set('username text','email'),
-greeter.set('email text','username'),
+greeter.set('username text','Email'),
+greeter.set('email text','Username'),
+greeter.set('password text','Password'),
+greeter.set('confirm text','Confirm'),
+greeter.set('name text','Full Name'),
 ```
 
-Update the registration code in `node_modules/snowpi-greeter/routes/views/greeter.js` to match your `User` model.
+Update the registration code in `node_modules/snowpi-greeter/index.js` to match your `User` model.
 
 
 
-The client jsx is not included.  Get it from snowpi-greeter
+The client jsx is not included.  Get it from [snowpi-greeter](https://github.com/snowkeeper/snowpi-greeter) which also contains the module
 
 `node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js` is the javascript file included by the client.

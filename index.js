@@ -38,21 +38,13 @@ var SnowpiGreeter = function() {
 	};
 }
 
-SnowpiGreeter.prototype.get = this.set;
 
-SnowpiGreeter.prototype.set = function(key,value) {
-	
-	if(key && !value) return this._options[key];
-	
-	this._options[key] = value;
-	
-	return this._options[key];
-	
-}
 
 SnowpiGreeter.prototype.statics = function() {
 	var app = keystone.app;
-	app.use("/snowpi", express.static(__dirname + "/public"));
+	console.log('add static',__dirname + "/public");
+	//app.use("/snowpi", express.static(__dirname + "/public"));
+	app.use( express.static(__dirname + "/public"));
 	/*
 	var statics = keystone.get('static');
 	
@@ -83,7 +75,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 	
 	/* add out static files as an additional directory
 	 * */
-	this.statics();
+	snowpi.statics();
 	
 	app.get(view,
 		function(req, res) {
@@ -109,6 +101,9 @@ SnowpiGreeter.prototype.add = function(setview) {
 				brand: keystone.get('brand'),
 				emailText: snowpi.get('email text'),
 				usernameText: snowpi.get('username text'),
+				passwordText: snowpi.get('password text'),
+				confirmText: snowpi.get('confirm text'),
+				nameText: snowpi.get('name text'),
 				user: req.user,
 				signout: keystone.get('signout url'),
 				section: {},
@@ -297,5 +292,18 @@ SnowpiGreeter.prototype.add = function(setview) {
 		}
 	); //end app.post
 }
+
+
+SnowpiGreeter.prototype.set = function(key,value) {
+	
+	if(key && !value) return this._options[key];
+	
+	this._options[key] = value;
+	
+	return this._options[key];
+	
+}
+
+SnowpiGreeter.prototype.get = SnowpiGreeter.prototype.set;
 
 var snowpigreeter = module.exports = exports = new SnowpiGreeter();

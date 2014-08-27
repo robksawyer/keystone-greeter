@@ -35,8 +35,9 @@ html
 			$(function() {
 				isMe = '#{csrf_token_value}';
 				isKey = '#{csrf_token_key}';
-				if(emailText)
-					Text.home.email = '#{emailText}';
-				if(usernameText)
-					Text.home.username = '#{emailText}';
+				#{emailText ? "Text.home.email = '"+emailText+"'":''};
+				#{usernameText ? "Text.home.username = '"+usernameText+"'":''};
+				#{passwordText ? "Text.home.password = '"+passwordText+"'":''};
+				#{confirmText ? "Text.home.confirm = '"+confirmText+"'":''};
+				#{nameText ? "Text.home.name = '"+nameText+"'":''};
 			});
