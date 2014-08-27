@@ -38,12 +38,12 @@ You will receive a 404 error if you do not do this.
 
 Built with ReactJS (decent commenting)
 
-The path for the signin page (default `/greeter`) and User registration can be toggled with `keystone` before calling `greeter.add`:
+The path for the signin page and User registration can be toggled with `keystone.set` before calling `greeter.add`:
 ```
 //these are the default values
 keystone.set('allow register', true),
 keystone.set('new user can admin', false),
-keystone.set('signin url','/my_path'),
+keystone.set('signin url','/greeter'),
 
 ```
 
