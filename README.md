@@ -25,7 +25,13 @@ keystone.start({
 
 ```
 
+**Note:
+If you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
+```
+greeter.statics()
 
+```
+You will receive a 404 error if you do not do this.
 
 Built with ReactJS (decent commenting)
 
