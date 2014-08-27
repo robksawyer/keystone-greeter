@@ -33,7 +33,6 @@ var SnowpiGreeter = function() {
 	keystone.set('new user can admin',keystone.set('new user can admin') || true);
 	
 	this._options = {
-		title: keystone.get('brand'),
 		greeter: keystone.get('signin url') || '/greeter',
 	};
 }
@@ -98,7 +97,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 			
 			var locals = {
 				env: keystone.get('env'),
-				brand: keystone.get('brand'),
+				brand: keystone.get('name'),
 				emailText: snowpi.get('email text'),
 				usernameText: snowpi.get('username text'),
 				passwordText: snowpi.get('password text'),
@@ -107,7 +106,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 				user: req.user,
 				signout: keystone.get('signout url'),
 				section: {},
-				title: snowpi.get('title'),
+				title: keystone.get('brand'),
 				csrf_token_key: keystone.security.csrf.TOKEN_KEY,
 				csrf_token_value: keystone.security.csrf.getToken(req, res),
 				csrf_query: '&' + keystone.security.csrf.TOKEN_KEY + '=' + keystone.security.csrf.getToken(req, res),
