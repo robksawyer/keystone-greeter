@@ -54,7 +54,7 @@ greeter.set('username text','email'),
 greeter.set('email text','username'),
 ```
 
-Update the registration code in `node_modules/snowpi-greeter/routes/views/signin.js` to match your `User` model.
+Update the registration code in `node_modules/snowpi-greeter/routes/views/greeter.js` to match your `User` model.
 
 
 
