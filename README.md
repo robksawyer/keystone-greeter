@@ -39,9 +39,9 @@ node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
 
 The client jsx is not included.  Get it from [snowpi-greeter](https://github.com/snowkeeper/snowpi-greeter) which also contains the module
 
-### then
+### then Setup
 
-In your keystone start file 
+In your Keystone (v. 0.2.27 & up) start file 
 
 ```
 var greeter = require('snowpi-greeter');
@@ -59,8 +59,8 @@ keystone.start({
 
 ```
 
-**Note:
-If you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
+** Note: **
+if you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
 ```
 var greeter = require('snowpi-greeter');
 
@@ -78,7 +78,7 @@ keystone.start({
 });
 
 ```
-You will receive a 404 error if you do not do this.
+**You will receive 404 errors if you do not do this and you are less than 0.2.27.**
 
 
 ###Configuration
@@ -120,7 +120,7 @@ greeter.set('email text','Username'),
 greeter.set('password text','Password'),
 greeter.set('confirm text','Confirm'),
 greeter.set('name text','Full Name'),
-greeter.set('info text','An email is the only way you ca reset your password.'),
+greeter.set('info text','Thanks for reading... shoot me an email at readthis at snowpi dot org to say hello!'),
 ```
 
 
