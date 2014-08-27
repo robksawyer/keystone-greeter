@@ -30,10 +30,12 @@ var SnowpiGreeter = function() {
 	/* set the keystone variables
 	 * */	 
 	keystone.set('allow register',keystone.get('allow register') || true);
-	keystone.set('new user can admin',keystone.set('new user can admin') || true);
+	keystone.set('new user can admin',keystone.get('new user can admin') || true);
 	
 	this._options = {
 		greeter: keystone.get('signin url') || '/greeter',
+		'greeter style' : true,
+		'keystone style' : true,
 	};
 }
 
@@ -103,6 +105,10 @@ SnowpiGreeter.prototype.add = function(setview) {
 				passwordText: snowpi.get('password text'),
 				confirmText: snowpi.get('confirm text'),
 				nameText: snowpi.get('name text'),
+				infoText: snowpi.get('info text'),
+				greeterStyle: snowpi.get('greeter style'),
+				keystoneStyle: snowpi.get('keystone style'),
+				customStyle: snowpi.get('custom style'),
 				user: req.user,
 				signout: keystone.get('signout url'),
 				section: {},
