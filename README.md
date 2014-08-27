@@ -1,4 +1,4 @@
-# Snowpi Greeter (module only)
+# Snowpi Greeter 
 ### A Keystone signin / registration form (ReactJS)
 
 Built with ReactJS (decent commenting)
