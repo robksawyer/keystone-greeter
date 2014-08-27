@@ -1,0 +1,42 @@
+doctype html
+html
+	//- HTML HEADER
+	head
+		meta(charset="utf-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		meta(http-equiv="X-UA-Compatible" content="IE=edge")
+
+		title= title || 'snowpi'
+		link(rel="shortcut icon", href="/favicon.ico", type="image/x-icon")
+
+		link(href="/snowpi/styles/site.min.css", rel="stylesheet")
+		link(href="/styles/site.min.css", rel="stylesheet")
+		
+		//- This file provides the default styling for the KeystoneJS Content Editor
+		if user && user.canAccessKeystone
+			link(href="/keystone/styles/content/editor.min.css", rel="stylesheet")
+		block css
+
+		//- Add any other template-specific HEAD tags by extending the head block
+		block head
+		
+	//- HTML BODY
+	body
+		#snowpi
+	
+		//- JAVASCRIPT
+		script(src='/snowpi/js/lib/jquery/jquery-2.1.1.min.js')
+		script(src='/snowpi/js/lib/bootstrap/bootstrap-3.2.0.min.js')
+		script(src='/snowpi/js/lib/react/build/react-with-addons.js')
+		script(src='/snowpi/js/lib/bower_components/react-bootstrap/react-bootstrap.min.js')
+		script(src='/snowpi/js/config.js')
+		script(src='/snowpi/js/lib/react/build/greeter.js')
+		script.
+			$(function() {
+				isMe = '#{csrf_token_value}';
+				isKey = '#{csrf_token_key}';
+				if(emailText)
+					Text.home.email = '#{emailText}';
+				if(usernameText)
+					Text.home.username = '#{emailText}';
+			});
