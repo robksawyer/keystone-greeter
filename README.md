@@ -11,17 +11,20 @@ npm install snowpi-greeter
 
 ### Conform
 
+We use like to use username for signin instead of email. <br />
 Update your User model (change `email` to `String` and add `realEmail`)
 ```
 email: { type: String, initial: true, required: true, index: true, label: 'username' },
 realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
 ```
+Notice the label field.  Your Keystone admin UI will still show the correct labels.
+
 ### or
 Set username to off
 ```
 greeter.set('use username',false)
 ```
-Change the form text.  See below.
+Set the form text.  See below.
 
 
 The username field remains in the form. You can remove it yourself or use it for another field.  Remember to update the controller if you want to use a new field.
