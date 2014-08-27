@@ -33,7 +33,7 @@ var SnowpiGreeter = function() {
 	keystone.set('new user can admin',keystone.set('new user can admin') || true);
 	
 	this._options = {
-		title: keystone.get('name'),
+		title: keystone.get('brand'),
 		greeter: keystone.get('signin url') || '/greeter',
 	};
 }
