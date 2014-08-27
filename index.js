@@ -76,6 +76,36 @@ SnowpiGreeter.prototype.add = function(setview) {
 	 * */
 	snowpi.statics();
 	
+	/* middleware to add apiResponse
+	 * */
+	var publicAPI = function(req, res, next) {
+		res.snowpiResponse = function(status) {
+			//add the requesting url back to the response
+			status.url=req.protocol + '://' + req.get('host') + req.originalUrl; 
+			/* you can customize the response here using the status object.  dont overwrite your existing props. */
+			
+			/* add in the response with json */
+			if (req.query.callback)
+				res.jsonp(status);
+			else
+				res.json(status);
+		};
+		res.snowpiError = function(key, err, msg, code) {
+			msg = msg || 'Error';
+			key = key || 'unknown error';
+			msg += ' (' + key + ')';
+			if (keystone.get('logger')) {
+				console.log(msg + (err ? ':' : ''));
+				if (err) {
+					console.log(err);
+				}
+			}
+			res.status(code || 500);
+			res.snowpiResponse({ error: key || 'error', detail: err });
+		};
+		next();
+	};
+	
 	app.get(view,
 		function(req, res) {
 			
@@ -127,33 +157,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 	/* add the api controller
 	 * */
 	app.post('/snowpi-greeter', 
-		function(req, res, next) {
-			res.apiResponse = function(status) {
-				//add the requesting url back to the response
-				status.url=req.protocol + '://' + req.get('host') + req.originalUrl; 
-				/* you can customize the response here using the status object.  dont overwrite your existing props. */
-				
-				/* add in the response with json */
-				if (req.query.callback)
-					res.jsonp(status);
-				else
-					res.json(status);
-			};
-			res.apiError = function(key, err, msg, code) {
-				msg = msg || 'Error';
-				key = key || 'unknown error';
-				msg += ' (' + key + ')';
-				if (keystone.get('logger')) {
-					console.log(msg + (err ? ':' : ''));
-					if (err) {
-						console.log(err);
-					}
-				}
-				res.status(code || 500);
-				res.apiResponse({ error: key || 'error', detail: err });
-			};
-			next();
-		},
+		publicAPI, //middleware to add api response
 		function(req, res) {
 	
 			if (req.user) {
