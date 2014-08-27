@@ -3,14 +3,17 @@
 
 ```
 npm install snowpi-greeter
+```
 
-
-// update your User model (change {email} to (String) and add {realEmail})
+Update your User model (change `email` to `String` and add `realEmail`)
+```
 email: { type: String, initial: true, required: true, index: true, label: 'username' },
 realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
+```
 
+In your keystone start file 
 
-// in your keystone start file 
+```
 var greeter = require('snowpi-greeter');
 
 //replace or update keystone.start() with this
