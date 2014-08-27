@@ -32,19 +32,16 @@ var SnowpiGreeter = function() {
 	keystone.set('allow register',keystone.get('allow register') || true);
 	keystone.set('new user can admin',keystone.get('new user can admin') || true);
 	
-	this._options = {
-		greeter: keystone.get('signin url') || '/greeter',
-		'greeter style' : true,
-		'keystone style' : true,
-	};
+	this.set(greeter,keystone.get('signin url') || '/greeter');
+	this.set('greeter style',true);
+	this.set('keystone style',true);
+
 }
 
 
 
 SnowpiGreeter.prototype.statics = function() {
 	var app = keystone.app;
-	console.log('add static',__dirname + "/public");
-	//app.use("/snowpi", express.static(__dirname + "/public"));
 	app.use( express.static(__dirname + "/public"));
 	/*
 	var statics = keystone.get('static');
@@ -301,7 +298,9 @@ SnowpiGreeter.prototype.add = function(setview) {
 
 SnowpiGreeter.prototype.set = function(key,value) {
 	
-	if(key && !value) return this._options[key];
+	if (arguments.length === 1) {
+		return this._options[key];
+	}
 	
 	this._options[key] = value;
 	
