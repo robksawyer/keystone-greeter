@@ -295,7 +295,8 @@ SnowpiGreeter.prototype.add = function(setview) {
 				}
 			
 			} else {
-				//no return for gets
+				//no truth for gets, fuck gets
+				return false;
 			}
 			
 		}
