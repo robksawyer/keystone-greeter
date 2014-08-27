@@ -32,12 +32,12 @@ html
 		script(src='/snowpi/js/config.js')
 		script(src='/snowpi/js/lib/react/build/greeter.js')
 		script.
-			$(function() {
-				isMe = '#{csrf_token_value}';
-				isKey = '#{csrf_token_key}';
-				#{emailText ? "Text.home.email = '"+emailText+"'":''};
-				#{usernameText ? "Text.home.username = '"+usernameText+"'":''};
-				#{passwordText ? "Text.home.password = '"+passwordText+"'":''};
-				#{confirmText ? "Text.home.confirm = '"+confirmText+"'":''};
-				#{nameText ? "Text.home.name = '"+nameText+"'":''};
-			});
+			
+			isMe = '#{csrf_token_value}';
+			isKey = '#{csrf_token_key}';
+			#{emailText ? "Text.home.email = '"+emailText+"'":''};
+			#{usernameText ? "Text.home.username = '"+usernameText+"'":''};
+			#{passwordText ? "Text.home.password = '"+passwordText+"'":''};
+			#{confirmText ? "Text.home.confirm = '"+confirmText+"'":''};
+			#{nameText ? "Text.home.name = '"+nameText+"'":''};
+			
