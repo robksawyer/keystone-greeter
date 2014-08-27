@@ -1,6 +1,6 @@
 {
   "name": "snowpi-greeter",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "private": false,
   "description": "Stand-alone signin and registration module for Keystone; built with ReactJS",
   "main": "index.js",
@@ -41,6 +41,6 @@
   },
   "scripts": {
   },
-  "_id": "snowpi-greeter@0.0.13",
-  "_from": "snowpi-greeter@0.0.12"
+  "_id": "snowpi-greeter@0.0.14",
+  "_from": "snowpi-greeter@0.0.13"
 }

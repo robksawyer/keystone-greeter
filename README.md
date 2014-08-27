@@ -3,15 +3,40 @@
 
 Built with ReactJS (decent commenting)
 
+### Install
+
 ```
 npm install snowpi-greeter
 ```
+
+### Conform
 
 Update your User model (change `email` to `String` and add `realEmail`)
 ```
 email: { type: String, initial: true, required: true, index: true, label: 'username' },
 realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
 ```
+### or
+Set username to off
+```
+greeter.set('use username',false)
+```
+Change the form text.  See below.
+
+
+The username field remains in the form. You can remove it yourself or use it for another field.  Remember to update the controller if you want to use a new field.
+```
+node_modules/snowpi-greeter/index.js
+```
+
+The compiled client ReactJS file is:
+```
+node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
+``` 
+
+The client jsx is not included.  Get it from [snowpi-greeter](https://github.com/snowkeeper/snowpi-greeter) which also contains the module
+
+### then
 
 In your keystone start file 
 
@@ -95,18 +120,5 @@ greeter.set('name text','Full Name'),
 greeter.set('info text','An email is the only way you ca reset your password.'),
 ```
 
-Update the registration code to match your User model: 
-```
-node_modules/snowpi-greeter/index.js
-```
- 
-
-
-The compiled client ReactJS file is:
-```
-node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
-``` 
-
-The client jsx is not included.  Get it from [snowpi-greeter](https://github.com/snowkeeper/snowpi-greeter) which also contains the module
 
 

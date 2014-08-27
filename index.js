@@ -36,7 +36,7 @@ var SnowpiGreeter = function() {
 	this.set('greeter',keystone.get('signin url') || '/greeter');
 	this.set('greeter style',true);
 	this.set('keystone style',true);
-
+	this.set('use username',true);
 }
 
 
@@ -247,13 +247,15 @@ SnowpiGreeter.prototype.add = function(setview) {
 								var userData = {
 									email: req.body.username,
 									password: req.body.password,
-									realEmail: req.body.email,
 									name: {
 										first: firstName,
 										last: lastName,
 									},
 									isAdmin: keystone.get('new user can admin')
 								};
+								if(snowpi.get('use username'))
+									userData.realEmail = req.body.email;
+									
 								var User = keystone.list('User').model,
 									newUser = new User(userData);
 								
