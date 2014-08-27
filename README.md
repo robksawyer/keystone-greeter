@@ -53,14 +53,17 @@ keystone.start({
 You will receive a 404 error if you do not do this.
 
 
+###Configuration
 
-The path for the signin page uses `Keystone` settings:
+The form submits to `/snowpi-greeter`
+
+The greeter page the user can access is set by `Keystone` settings:
 ```
 //will default to /greeter if not defined
 
 keystone.set('signin url','/greeter'),
 ```
-The form submits to `/snowpi-greeter`
+
 
 User registration can be toggled with `keystone.set` before calling `greeter.add`:
 ```
@@ -71,6 +74,16 @@ keystone.set('new user can admin', false),
 
 ```
 
+Control the stylesheets before calling `greeter.add`:
+
+```javascript
+greeter.set('greeter style',true), // include default css
+greeter.set('keystone style',true), // include /styles/site.min.css
+greeter.set('custom style','/styles/custom.css'), // include custom css
+```
+The default is to include default greeter css first and `/styles/site.min.css` second so that your css automatically overrides the greeter out of the box.  Custom styles is false unless explicitly set.
+
+
 You can change the default form text values before calling `greeter.add`:
 
 ```javascript
@@ -79,6 +92,7 @@ greeter.set('email text','Username'),
 greeter.set('password text','Password'),
 greeter.set('confirm text','Confirm'),
 greeter.set('name text','Full Name'),
+greeter.set('info text','An email is the only way you ca reset your password.'),
 ```
 
 Update the registration code to match your User model: 
@@ -88,7 +102,7 @@ node_modules/snowpi-greeter/index.js
  
 
 
-The client ReactJS file is:
+The compiled client ReactJS file is:
 ```
 node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
 ``` 
