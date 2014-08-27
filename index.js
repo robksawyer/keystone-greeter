@@ -27,6 +27,7 @@ var appRoot = (function(_rootPath) {
 
 var SnowpiGreeter = function() {
 	
+	this._options = {}
 	/* set the keystone variables
 	 * */	 
 	keystone.set('allow register',keystone.get('allow register') || true);
