@@ -1,6 +1,8 @@
 # Snowpi Greeter (module only)
 ### A Keystone signin / registration form (ReactJS)
 
+Built with ReactJS (decent commenting)
+
 ```
 npm install snowpi-greeter
 ```
@@ -32,12 +34,25 @@ keystone.start({
 **Note:
 If you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
 ```
+var greeter = require('snowpi-greeter');
+
 greeter.statics()
+
+//replace or update keystone.start() with this
+
+keystone.start({
+	onMount: function() {
+		
+		/* include our greeter pages
+		 * */
+		greeter.add();
+	}
+});
 
 ```
 You will receive a 404 error if you do not do this.
 
-Built with ReactJS (decent commenting)
+
 
 The path for the signin page uses `Keystone` settings:
 ```
@@ -66,10 +81,18 @@ greeter.set('confirm text','Confirm'),
 greeter.set('name text','Full Name'),
 ```
 
-Update the registration code in `node_modules/snowpi-greeter/index.js` to match your `User` model.
+Update the registration code to match your User model: 
+```
+node_modules/snowpi-greeter/index.js
+```
+ 
 
 
+The client ReactJS file is:
+```
+node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
+``` 
 
 The client jsx is not included.  Get it from [snowpi-greeter](https://github.com/snowkeeper/snowpi-greeter) which also contains the module
 
-`node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js` is the javascript file included by the client.
+
