@@ -59,7 +59,7 @@ keystone.start({
 
 ```
 
-** Note: **
+**Note:**
 if you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
 ```
 var greeter = require('snowpi-greeter');
