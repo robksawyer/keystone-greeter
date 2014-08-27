@@ -17,6 +17,7 @@ In your keystone start file
 var greeter = require('snowpi-greeter');
 
 //replace or update keystone.start() with this
+
 keystone.start({
 	onMount: function() {
 		
@@ -38,16 +39,24 @@ You will receive a 404 error if you do not do this.
 
 Built with ReactJS (decent commenting)
 
-The path for the signin page and User registration can be toggled with `keystone.set` before calling `greeter.add`:
+The path for the signin page uses `Keystone` settings:
+```
+//will default to /greeter if not defined
+
+keystone.set('signin url','/greeter'),
+```
+The form submits to `/snowpi-greeter`
+
+User registration can be toggled with `keystone.set` before calling `greeter.add`:
 ```
 //these are the default values
 keystone.set('allow register', true),
 keystone.set('new user can admin', false),
-keystone.set('signin url','/greeter'),
+
 
 ```
 
-Change the default text values  before calling `greeter.add`:
+You can change the default form text values before calling `greeter.add`:
 
 ```javascript
 greeter.set('username text','Email'),
