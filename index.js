@@ -32,7 +32,7 @@ var SnowpiGreeter = function() {
 	keystone.set('allow register',keystone.get('allow register') || true);
 	keystone.set('new user can admin',keystone.get('new user can admin') || true);
 	
-	this.set(greeter,keystone.get('signin url') || '/greeter');
+	this.set('greeter',keystone.get('signin url') || '/greeter');
 	this.set('greeter style',true);
 	this.set('keystone style',true);
 
