@@ -108,19 +108,19 @@ Assign the form fields to your model fields.
 The first signin form field is  **username**. We will use this to check signins.
 ```
 //these are the default values
-	greeter.set('form username', 'email');
-	greeter.set('form password', 'password');
-	greeter.set('form name', ['name','first','last']);
+	greeter.set('field username', 'email');
+	greeter.set('field password', 'password');
+	greeter.set('field name', ['name','first','last']);
     
 ```
 
 There is a 4th input available if you use usernames instead of emails to login.  
 ```
 //this would change to using a true username
-	greeter.set('form username', 'email');
-	greeter.set('form password', 'password');
-	greeter.set('form name', ['name','first','last']);
-	greeter.set('form email', 'realEmail');
+	greeter.set('field username', 'email');
+	greeter.set('field password', 'password');
+	greeter.set('field name', ['name','first','last']);
+	greeter.set('field email', 'realEmail');
     
 // model changes -- email to String
 email: { type: String, initial: true, required: true, index: true, label: 'username' },
@@ -130,7 +130,7 @@ realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
 The **`name`** form field is a special case. 
 It can be a `String` or an `Array`.  An `Array` will be used to form a new `Object`:
 ```
-greeter.set('form name', ['name','first','last'])
+greeter.set('field name', ['name','first','last'])
 
 ```
 wll create
@@ -146,7 +146,7 @@ userDoc.name = {
 ```
 A two element `Array` creates an object without the `split()`
 ```
-greeter.set('form name', ['person','name']
+greeter.set('field name', ['person','name']
 ```
 wll create
 ```
@@ -156,8 +156,8 @@ userDoc.person = {
 ```
 A simple string or single element `Array` are the same
 ```
-greeter.set('form name', ['name']);
-greeter.set('form name', 'name');
+greeter.set('field name', ['name']);
+greeter.set('field name', 'name');
 ```
 and create
 ```

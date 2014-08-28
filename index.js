@@ -39,10 +39,10 @@ var SnowpiGreeter = function() {
 	this.set('greeter style',true);
 	this.set('keystone style',true);
 	
-	this.set('form username', 'email');
-	this.set('form password', 'password');
-	this.set('form name', ['name','first','last']);
-	this.set('form email', false);
+	this.set('field username', 'email');
+	this.set('field password', 'password');
+	this.set('field name', ['name','first','last']);
+	this.set('field email', false);
 	
 }
 
@@ -258,7 +258,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 								 * */
 								
 								var userData = {}
-								var name =snowpi.get('form name');
+								var name =snowpi.get('field name');
 								if(name) {
 									if(name instanceof Array && name.length > 2) {
 										
@@ -294,12 +294,12 @@ SnowpiGreeter.prototype.add = function(setview) {
 										
 									}
 								}
-								if(snowpi.get('form username'))
+								if(snowpi.get('field username'))
 									userData[snowpi.get('form username')] = req.body.username
-								if(snowpi.get('form password'))
+								if(snowpi.get('field password'))
 									userData[snowpi.get('form password')] = req.body.password
-								if(snowpi.get('form email'))
-									userData[snowpi.get('form email')] = req.body.email
+								if(snowpi.get('field email'))
+									userData[snowpi.get('field email')] = req.body.email
 								userData.isAdmin = snowpi.get('new user can admin')
 								
 								var User = keystone.list('User').model,
