@@ -146,7 +146,7 @@ userDoc.name = {
 ```
 A two element `Array` creates an object without the `split()`
 ```
-greeter.set('field name', ['person','name']
+greeter.set('field name', ['person','name'])
 ```
 wll create
 ```
