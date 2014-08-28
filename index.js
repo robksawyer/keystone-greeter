@@ -28,15 +28,22 @@ var appRoot = (function(_rootPath) {
 var SnowpiGreeter = function() {
 	
 	this._options = {}
-	/* set the keystone variables
+	/* set the module variables
 	 * */	 
-	keystone.set('allow register',keystone.get('allow register') || true);
-	keystone.set('new user can admin',keystone.get('new user can admin') || true);
+	this.set('allow register',true);
+	this.set('new user can admin',false);
 	
 	this.set('greeter',keystone.get('signin url') || '/greeter');
+	this.set('redirect timer',5000);
+	
 	this.set('greeter style',true);
 	this.set('keystone style',true);
-	this.set('use username',true);
+	
+	this.set('form username', 'email');
+	this.set('form password', 'password');
+	this.set('form name', ['name','first','last']);
+	this.set('form email', false);
+	
 }
 
 
@@ -45,6 +52,8 @@ SnowpiGreeter.prototype.statics = function() {
 	var app = keystone.app;
 	app.use( express.static(__dirname + "/public"));
 	/*
+	 * this was handy but we hit the keystone process too late to use it
+	 * 
 	var statics = keystone.get('static');
 	
 	if(statics && statics instanceof Array) {
@@ -109,7 +118,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 	app.get(view,
 		function(req, res) {
 			
-			//keystone isnt ready for custom templates so we need to send our own result here
+			//send our own result here
 			var templatePath = __dirname + '/templates/views' + view + '.jade';
 			
 			var jadeOptions = {
@@ -161,12 +170,12 @@ SnowpiGreeter.prototype.add = function(setview) {
 		function(req, res) {
 	
 			if (req.user) {
-				return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:'You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? ',code:200,data:{},redirect:{path:'/keystone',when:20000}});
+				return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:'You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? ',code:200,data:{},redirect:{path:keystone.get('signin redirect'),when:20000}});
 			}
 			
 			if (req.method === 'POST') {
 				
-				console.log('session',req.session)
+				
 				if (!keystone.security.csrf.validate(req)) {
 					return res.snowpiResponse({action:'greeter',command:'directions',success:'no',message:'Bad token',code:501,data:{}});
 				}
@@ -187,7 +196,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 					
 					var onSuccess = function(user) {			
 						
-						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:'welcome back ' + user.fullname,code:200,data:{person:user},redirect:{path:'/keystone',when:10000}});
+						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:'welcome back ' + user.fullname,code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 					}
 					
 					var onFail = function() {
@@ -197,8 +206,8 @@ SnowpiGreeter.prototype.add = function(setview) {
 					keystone.session.signin({ email: req.body.username, password: req.body.password }, req, res, onSuccess, onFail);
 					
 				} else if(req.body.register === yes) { 
-					
-					if(keystone.get('allow register'))
+					console.log('allow register',snowpi.get('allow register'))
+					if(snowpi.get('allow register'))
 					{
 						async.series([
 							
@@ -245,21 +254,54 @@ SnowpiGreeter.prototype.add = function(setview) {
 							
 							function(cb) {
 								console.log('add user');
-								var splitName = req.body.name.split(' '),
-									firstName = splitName[0],
-									lastName = splitName[1];
-								var userData = {
-									email: req.body.username,
-									password: req.body.password,
-									name: {
-										first: firstName,
-										last: lastName,
-									},
-									isAdmin: keystone.get('new user can admin')
-								};
-								if(snowpi.get('use username'))
-									userData.realEmail = req.body.email;
+								/* build the doc from our set variables
+								 * */
+								
+								var userData = {}
+								var name =snowpi.get('form name');
+								if(name) {
+									if(name instanceof Array && name.length > 2) {
+										
+										var splitName = req.body.name.split(' ');
+										
+										userData[name[0]] = {}
+										
+										userData[name[0]][name[1]] = splitName[0];
+										var cname;
+										if(splitName.length >2) {
+											
+											for(var i=1;i<=splitName.length;i++) {
+												cname+=' ' + splitName[i]
+											}
+											
+										} else {
+											cname = splitName[1]
+										}
+										userData[name[0]][name[2]] =cname;
 									
+									} else if(name instanceof Array && name.length === 2) {
+										
+										userData[name[0]] = {}
+										userData[name[0]][name[1]] = req.body.name;
+										
+									} else if(name instanceof Array){
+										
+										userData[name[0]] = req.body.name;
+										
+									} else {
+										
+										userData[name] = req.body.name;
+										
+									}
+								}
+								if(snowpi.get('form username'))
+									userData[snowpi.get('form username')] = req.body.username
+								if(snowpi.get('form password'))
+									userData[snowpi.get('form password')] = req.body.password
+								if(snowpi.get('form email'))
+									userData[snowpi.get('form email')] = req.body.email
+								userData.isAdmin = snowpi.get('new user can admin')
+								
 								var User = keystone.list('User').model,
 									newUser = new User(userData);
 								
@@ -276,7 +318,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 								return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'there was a problem creating the user account',code:401,data:{}});
 							}
 							var onSuccess = function(user) {
-								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:'welcome ' + user.fullname + '.',code:200,data:{person:user},redirect:{path:'/keystone',when:10000}});
+								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:'welcome ' + user.fullname + '.',code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 							}
 							
 							var onFail = function(e) {
