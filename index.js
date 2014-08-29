@@ -137,12 +137,12 @@ SnowpiGreeter.prototype.add = function(setview) {
 			var locals = {
 				env: keystone.get('env'),
 				brand: keystone.get('name'),
-				emailText: snowpi.get('email text'),
-				usernameText: snowpi.get('username text'),
-				passwordText: snowpi.get('password text'),
-				confirmText: snowpi.get('confirm text'),
-				nameText: snowpi.get('name text'),
-				infoText: snowpi.get('info text'),
+				emailText: snowpi.get('email label'),
+				usernameText: snowpi.get('username label'),
+				passwordText: snowpi.get('password label'),
+				confirmText: snowpi.get('confirm label'),
+				nameText: snowpi.get('name label'),
+				infoText: snowpi.get('info label'),
 				greeterStyle: snowpi.get('greeter style'),
 				keystoneStyle: snowpi.get('keystone style'),
 				customStyle: snowpi.get('custom style'),
@@ -351,7 +351,12 @@ SnowpiGreeter.prototype.set = function(key,value) {
 	if (arguments.length === 1) {
 		return this._options[key];
 	}
-	
+	// old config used text instead of label
+	if(key.trim().slice(-4) === 'text') {
+		this._options[key] = value;
+		var nn = key.trim().split(' ');
+		key = nn[0] + ' label';
+	}
 	this._options[key] = value;
 	
 	return this._options[key];
