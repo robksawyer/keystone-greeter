@@ -13,12 +13,15 @@ You can update the controller if you want to use more than 4 registration fields
 ```
 node_modules/snowpi-greeter/index.js
 ```
-The compiled client ReactJS file is:
+The compiled client ReactJS file is located at:
 ```
 node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
 ``` 
 
-The client jsx is not included.  Get it from [snowpi-greeter](https://github.com/snowkeeper/snowpi-greeter) which also contains the module
+The client jsx is now included at:  
+```
+node_modules/snowpi_greeter/public/snowpi/js/lib/react/jsx/greeter.js
+``` 
 
 ### then Setup
 
@@ -127,7 +130,9 @@ email: { type: String, initial: true, required: true, index: true, label: 'usern
 realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
 
 ```
-The **`name`** form field is a special case. 
+*Notice that `label` in the field definitions keeps Keystone UI the same
+
+The **` name `** form field is a special case. 
 It can be a `String` or an `Array`.  An `Array` will be used to form a new `Object`:
 ```
 greeter.set('field name', ['name','first','last'])
@@ -165,7 +170,7 @@ userDoc.name = req.body.name
 ```
 
 ####Form Text
-Change the default form text values to match your model 
+Change the default form labels to match your model 
 ```javascript
 greeter.set('username text','This is the login input and first register input'),
 greeter.set('password text','Password'),
