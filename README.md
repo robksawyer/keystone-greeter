@@ -184,7 +184,7 @@ Change the default form labels to match your model
 	greeter.set('info label','Thanks for reading... shoot me an email at readthis at snowpi dot org to say hello!'),
 ```
 
-###Return Messages
+####Return Messages
 Change the return message contents
 ```
 	greeter.set('message valid credentials', 'a valid username and password are required');
