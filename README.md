@@ -179,9 +179,10 @@ Change the default form labels to match your model
 	greeter.set('username label','This is the login input and first register input'),
 	greeter.set('password label','Password'),
 	greeter.set('confirm label','Confirm'),
+	greeter.set('info label','Providing a valid email is the only way to reset your password.'),
 	greeter.set('name label','Full Name'),
 	greeter.set('email label','Remember this is not the login input'),
-	greeter.set('info label','Thanks for reading... shoot me an email at readthis at snowpi dot org to say hello!'),
+	
 ```
 
 ####Return Messages
