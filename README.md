@@ -3,6 +3,10 @@
 
 Built with ReactJS (decent commenting)
 
+[https://code.snowpi.org/signin] Demo - styled <br />
+[https://code.snowpi.org/greeter] Demo - un-styled
+
+
 ### Install
 
 ```
