@@ -176,12 +176,24 @@ userDoc.name = req.body.name
 ####Form Text
 Change the default form labels to match your model 
 ```javascript
-greeter.set('username label','This is the login input and first register input'),
-greeter.set('password label','Password'),
-greeter.set('confirm label','Confirm'),
-greeter.set('name label','Full Name'),
-greeter.set('email label','Remember this is not the login input'),
-greeter.set('info label','Thanks for reading... shoot me an email at readthis at snowpi dot org to say hello!'),
+	greeter.set('username label','This is the login input and first register input'),
+	greeter.set('password label','Password'),
+	greeter.set('confirm label','Confirm'),
+	greeter.set('name label','Full Name'),
+	greeter.set('email label','Remember this is not the login input'),
+	greeter.set('info label','Thanks for reading... shoot me an email at readthis at snowpi dot org to say hello!'),
 ```
 
-
+###Return Messages
+Change the return message contents
+```
+	greeter.set('message valid credentials', 'a valid username and password are required');
+	greeter.set('message welcome', 'Welcome back {user}. ');
+	greeter.set('message welcome login', 'Welcome back.  Please signin');
+	greeter.set('message registration closed', 'registration is currently closed');
+	greeter.set('message current user', 'You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? ');
+	greeter.set('message bad token', 'bad request token.  <a href="javascript:location.reload()">refresh</a>');
+	greeter.set('message username taken', 'the username requested is not available');
+	greeter.set('message failed register', 'there was a problem creating your new account.');
+	greeter.set('message register all fields', 'please fill in username, password and password again...');
+```

@@ -44,6 +44,15 @@ var SnowpiGreeter = function() {
 	this.set('field name', ['name','first','last']);
 	this.set('field email', false);
 	
+	this.set('message valid credentials', 'a valid username and password are required');
+	this.set('message welcome', 'Welcome back {user}. ');
+	this.set('message welcome login', 'Welcome back.  Please signin');
+	this.set('message registration closed', 'registration is currently closed');
+	this.set('message current user', 'You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? ');
+	this.set('message bad token', 'bad request token.  <a href="javascript:location.reload()">refresh</a>');
+	this.set('message username taken', 'the username requested is not available');
+	this.set('message failed register', 'there was a problem creating your new account.');
+	this.set('message register all fields', 'please fill in username, password and password again...');
 }
 
 
@@ -170,14 +179,14 @@ SnowpiGreeter.prototype.add = function(setview) {
 		function(req, res) {
 	
 			if (req.user) {
-				return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:'You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? ',code:200,data:{},redirect:{path:keystone.get('signin redirect'),when:20000}});
+				return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message current user'),code:200,data:{},redirect:{path:keystone.get('signin redirect'),when:20000}});
 			}
 			
 			if (req.method === 'POST') {
 				
 				
 				if (!keystone.security.csrf.validate(req)) {
-					return res.snowpiResponse({action:'greeter',command:'directions',success:'no',message:'Bad token',code:501,data:{}});
+					return res.snowpiResponse({action:'greeter',command:'directions',success:'no',message:snowpi.get('message bad token'),code:501,data:{}});
 				}
 				var locals = res.locals;
 				
@@ -191,16 +200,16 @@ SnowpiGreeter.prototype.add = function(setview) {
 					
 					if (!req.body.username || !req.body.password) {
 						
-						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:'username and password required',code:401,data:{}});
+						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:snowpi.get('message valid credentials'),code:401,data:{}});
 					}
 					
 					var onSuccess = function(user) {			
 						
-						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:'welcome back ' + user.fullname,code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
+						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message welcome').replace('{user}',user.fullname),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 					}
 					
 					var onFail = function() {
-						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:'valid username and password required',code:401,data:{}});
+						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:snowpi.get('message valid credentials'),code:401,data:{}});
 					}
 					
 					keystone.session.signin({ email: req.body.username, password: req.body.password }, req, res, onSuccess, onFail);
@@ -214,11 +223,11 @@ SnowpiGreeter.prototype.add = function(setview) {
 							function(cb) {
 								
 								if (!req.body.password || !req.body.confirm || !req.body.username) {
-									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'please enter a username, password and password again...',code:401,data:{}});
+									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message register all fields'),code:401,data:{}});
 								}
 								
 								if (req.body.password != req.body.confirm) {
-									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'your passwords must match',code:401,data:{}});
+									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message password match'),code:401,data:{}});
 								}
 								
 								return cb();
@@ -230,7 +239,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 								keystone.list('User').model.findOne({ email: req.body.username }, function(err, user) {
 									
 									if (err || user) {
-										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'user exists with that username',code:401,data:{}});
+										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message username taken'),code:401,data:{}});
 									}
 									
 									return cb();
@@ -315,21 +324,21 @@ SnowpiGreeter.prototype.add = function(setview) {
 							
 							if (err) 
 							{
-								return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'there was a problem creating the user account',code:401,data:{}});
+								return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message failed register'),code:401,data:{}});
 							}
 							var onSuccess = function(user) {
-								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:'welcome ' + user.fullname + '.',code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
+								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome').replace('{user}',user.fullname),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 							}
 							
 							var onFail = function(e) {
-								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:'User account was created.  Please log in.',code:401,data:{}});
+								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome login'),code:401,data:{}});
 							}
 							
 							keystone.session.signin({ email: req.body.username, password: req.body.password }, req, res, onSuccess, onFail);
 							
 						});
 					} else {
-						return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'registration is not allowed at this time.',code:401,data:{}});
+						return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message registration closed'),code:401,data:{}});
 					}
 					
 				} else {
