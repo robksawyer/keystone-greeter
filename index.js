@@ -87,8 +87,9 @@ SnowpiGreeter.prototype.add = function(setview) {
 	/* add the greeter page
 	 * */
 	var 	app = keystone.app,
-		view = setview || this.get('greeter') || '/greeter',
+		view = setview && setview !== undefined ? setview: this.get('greeter') || '/greeter',
 		snowpi = this;
+	
 	
 	/* add out static files as an additional directory
 	 * */
@@ -128,7 +129,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 		function(req, res) {
 			
 			//send our own result here
-			var templatePath = __dirname + '/templates/views' + view + '.jade';
+			var templatePath = __dirname + '/templates/views/greeter.jade';
 			
 			var jadeOptions = {
 				filename: templatePath,
