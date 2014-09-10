@@ -11,6 +11,11 @@ Built with ReactJS (decent commenting)
 
 ```
 npm install snowpi-greeter
+
+//or add to package.json
+"dependencies": {
+	"snowpi-greeter": "~0.1.x"
+}
 ```
 
 You can update the controller if you want to use more than 4 registration fields.
@@ -27,7 +32,7 @@ The client jsx is now included at:
 node_modules/snowpi_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 ``` 
 
-### then Setup
+### Setup
 
 In your Keystone (v. 0.2.27 & up) start file 
 
