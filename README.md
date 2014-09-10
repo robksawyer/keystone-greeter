@@ -82,7 +82,7 @@ The form submits to `/snowpi-greeter`.  This is a static value.
 
 The greeter uri defaults to `/greeter` and can be set 3 ways in overriding order:
 ```
-keystone.set('sign url','/greeter') //set this on init as a fallback if available
+keystone.set('sign url','/greeter') 
 
 greeter.set('greeter','/greeter') //this overrides keystone.set
 
