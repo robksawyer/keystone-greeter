@@ -73,11 +73,16 @@ keystone.start({
 
 #####All items need to be set before calling `greeter.add`:
 
-The form submits to `/snowpi-greeter`
+The form submits to `/snowpi-greeter`.  This is a static value.
 
-The greeter uri is inherited from the Keystone setting `signin url`.  You can override that:
+The greeter uri defaults to `/greeter` and can be set 3 ways in overriding order:
 ```
-greeter.set('greeter','/greeter')
+keystone.set('sign url','/greeter') //set this on init as a fallback if available
+
+greeter.set('greeter','/greeter') //this overrides keystone.set
+
+//set the page on add
+greeter.add('/greeter') //this overrides everything
 ```
 
 The success redirect page is inherited from Keystone
