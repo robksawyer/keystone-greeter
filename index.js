@@ -29,7 +29,8 @@ var SnowpiGreeter = function() {
 	
 	this._options = {}
 	/* set the module variables
-	 * */	 
+	 * */	
+	this.set('user model',keystone.get('user model') || 'User');
 	this.set('allow register',true);
 	this.set('new user can admin',false);
 	
@@ -88,10 +89,11 @@ SnowpiGreeter.prototype.add = function(setview) {
 	 * */
 	var 	app = keystone.app,
 		view = setview && setview !== undefined ? setview: this.get('greeter') || '/greeter',
-		snowpi = this;
+		snowpi = this,
+		userModel = this.get('user model');
 	
 	
-	/* add out static files as an additional directory
+	/* add our static files as an additional directory
 	 * */
 	snowpi.statics();
 	
@@ -237,7 +239,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							
 							function(cb) {
 								console.log('check user');
-								keystone.list('User').model.findOne({ email: req.body.username }, function(err, user) {
+								keystone.list(userModel).model.findOne({ email: req.body.username }, function(err, user) {
 									
 									if (err || user) {
 										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message username taken'),code:401,data:{}});
@@ -250,7 +252,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							},
 							function(cb) {
 								console.log('check email');
-								keystone.list('User').model.findOne({ realEmail: req.body.email }, function(err, user) {
+								keystone.list(userModel).model.findOne({ realEmail: req.body.email }, function(err, user) {
 									
 									if (err || user) {
 										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'user exists with that email',code:401,data:{}});
@@ -312,7 +314,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 									userData[snowpi.get('field email')] = req.body.email
 								userData.isAdmin = snowpi.get('new user can admin')
 								
-								var User = keystone.list('User').model,
+								var User = keystone.list(userModel).model,
 									newUser = new User(userData);
 								
 								newUser.save(function(err) {

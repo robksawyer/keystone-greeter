@@ -80,6 +80,11 @@ keystone.start({
 
 The form submits to `/snowpi-greeter`.  This is a static value.
 
+The User Model defaults to `keystone.get('user model')`. Override with:
+```
+greeter.set('user model','myUsers')
+```
+
 The greeter uri defaults to `/greeter` and can be set 3 ways in overriding order:
 ```
 keystone.set('sign url','/greeter') 
