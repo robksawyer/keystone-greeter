@@ -199,6 +199,9 @@ Change the default form labels to match your model
 	greeter.set('name label','Full Name'),
 	greeter.set('email label','Remember this is not the login input'),
 	
+	//change the logo in the header
+	greeter.set('logoman','<span></span>'),
+	
 ```
 
 ####Return Messages
