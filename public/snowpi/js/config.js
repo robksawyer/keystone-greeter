@@ -8,52 +8,6 @@ var Text = {
 		name: 'Inqusive Website',
 		text: 'build',
 	},
-	
-	screenA: {
-		text: 'Release',
-		modal: {
-			btnA: {
-				text: 'Play Ball',
-				confirm: 'Really STOP the countdown and go back LIVE?',
-			},
-			btnB: {
-				text: 'Continue Timing',
-				
-			},
-		}
-	},
-	screenB: {
-		text: 'Hold',
-		modal: {
-			btnA: {
-				text: 'Hold',
-			},
-			btnB: {
-				text: 'Live',
-			},
-			btnC: {
-				text: 'Challenge',
-			},
-			btnD: {
-				text: 'Release to Break',
-			},
-		}
-	},
-	screenC: {
-		text: 'Challenge',
-		modal: {
-			btnA: {
-				text: 'Continue Challenge',
-			},
-			btnB: {
-				text: 'Play Ball',
-			},
-			btnC: {
-				text: 'Release to Break',
-			},
-			
-		}
-	},  
 	home: {
 		username: 'username',
 		password: 'password',
