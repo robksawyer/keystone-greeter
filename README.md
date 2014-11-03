@@ -37,6 +37,7 @@ node_modules/snowpi_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 In your Keystone (v. 0.2.27 & up) start file 
 
 ```
+var keystone = require('keystone');
 var greeter = require('snowpi-greeter');
 
 //replace or update keystone.start() with this
