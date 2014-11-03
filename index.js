@@ -153,6 +153,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 				usernameText: snowpi.get('username label'),
 				passwordText: snowpi.get('password label'),
 				confirmText: snowpi.get('confirm label'),
+				logoman: snowpi.get('logoman'),
 				nameText: snowpi.get('name label'),
 				infoText: snowpi.get('info label'),
 				greeterStyle: snowpi.get('greeter style'),
