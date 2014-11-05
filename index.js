@@ -379,3 +379,11 @@ SnowpiGreeter.prototype.set = function(key,value) {
 SnowpiGreeter.prototype.get = SnowpiGreeter.prototype.set;
 
 var snowpigreeter = module.exports = exports = new SnowpiGreeter();
+/**
+ * 2014 snowkeeper
+ * github.com/snowkeeper
+ * npmjs.org/snowkeeper
+ * 
+ * Peace :0)
+ * 
+ * */
