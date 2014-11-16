@@ -77,6 +77,11 @@ keystone.start({
 
 ###Configuration
 
+debug
+```
+greeter.set('debug',false)
+```
+
 #####All items need to be set before calling `greeter.add`:
 
 The form submits to `/snowpi-greeter`.  This is a static value.

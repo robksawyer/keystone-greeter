@@ -219,7 +219,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 					keystone.session.signin({ email: req.body.username, password: req.body.password }, req, res, onSuccess, onFail);
 					
 				} else if(req.body.register === yes) { 
-					console.log('allow register',snowpi.get('allow register'))
+					if(snowpi.get('debug'))console.log('allow register',snowpi.get('allow register'))
 					if(snowpi.get('allow register'))
 					{
 						async.series([
@@ -239,7 +239,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							},
 							
 							function(cb) {
-								console.log('check user');
+								if(snowpi.get('debug'))console.log('check user');
 								keystone.list(userModel).model.findOne({ email: req.body.username }, function(err, user) {
 									
 									if (err || user) {
@@ -252,7 +252,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 								
 							},
 							function(cb) {
-								console.log('check email');
+								if(snowpi.get('debug'))console.log('check email');
 								keystone.list(userModel).model.findOne({ realEmail: req.body.email }, function(err, user) {
 									
 									if (err || user) {
@@ -266,7 +266,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							},
 							
 							function(cb) {
-								console.log('add user');
+								if(snowpi.get('debug'))console.log('add user');
 								/* build the doc from our set variables
 								 * */
 								
@@ -284,11 +284,11 @@ SnowpiGreeter.prototype.add = function(setview) {
 										if(splitName.length >2) {
 											
 											for(var i=1;i<=splitName.length;i++) {
-												cname+=' ' + splitName[i]
+												cname+=' ' + (splitName[i] || '');
 											}
 											
 										} else {
-											cname = splitName[1]
+											cname = splitName[1] || '';
 										}
 										userData[name[0]][name[2]] =cname;
 									
@@ -308,16 +308,16 @@ SnowpiGreeter.prototype.add = function(setview) {
 									}
 								}
 								if(snowpi.get('field username'))
-									userData[snowpi.get('form username')] = req.body.username
+									userData[snowpi.get('field username')] = req.body.username
 								if(snowpi.get('field password'))
-									userData[snowpi.get('form password')] = req.body.password
+									userData[snowpi.get('field password')] = req.body.password
 								if(snowpi.get('field email'))
 									userData[snowpi.get('field email')] = req.body.email
 								userData.isAdmin = snowpi.get('new user can admin')
 								
 								var User = keystone.list(userModel).model,
 									newUser = new User(userData);
-								
+								if(snowpi.get('debug'))console.log('new user set to save',newUser,req.body);
 								newUser.save(function(err) {
 									return cb(err);
 								});
@@ -328,6 +328,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							
 							if (err) 
 							{
+								if(snowpi.get('debug'))console.log('user reg failed',err);
 								return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message failed register'),code:401,data:{}});
 							}
 							var onSuccess = function(user) {
