@@ -130,6 +130,10 @@ SnowpiGreeter.prototype.add = function(setview) {
 	app.get(view,
 		function(req, res) {
 			
+			if (req.user) {
+				return res.redirect(keystone.get('signin redirect'));
+			}
+			
 			//send our own result here
 			var templatePath = __dirname + '/templates/views/greeter.jade';
 			
