@@ -53,12 +53,12 @@ var SnowpiGreeter = function() {
 
 
 
-SnowpiGreeter.prototype.statics = function() {
+SnowpiGreeter.prototype._statics = function() {
 	var app = keystone.app;
 	app.use( express.static(__dirname + "/public"));
 }
 
-SnowpiGreeter.prototype.public = function() {
+SnowpiGreeter.prototype.statics = function() {
 	var static = keystone.get('static');
 	if (!_.isArray(static)) {
 		static = [static]
@@ -80,7 +80,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 	
 	/* add our static files as an additional directory
 	 * */
-	if(!this._public) snowpi.statics();
+	if(!this._public) snowpi._statics();
 	
 	/* middleware to add snowpiResponse
 	 * */

@@ -84,8 +84,6 @@ greeter.set('debug',false)
 
 #####All items need to be set before calling `greeter.add`:
 
-The form submits to `/keystone-greeter`.  This is a static value.
-
 The User Model defaults to `keystone.get('user model')`. Override with:
 ```
 greeter.set('user model','myUsers')
