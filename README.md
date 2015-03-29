@@ -38,9 +38,9 @@ node_modules/keystone_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 var keystone = require('keystone');
 var greeter = require('keystone-greeter');
 
-greeter.statics()
+//replace or update keystone.start()
 
-//replace or update keystone.start() with this
+greeter.statics()
 
 keystone.start({
 	onMount: function() {
