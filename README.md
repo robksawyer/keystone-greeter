@@ -34,28 +34,8 @@ node_modules/keystone_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 
 ### Setup
 
-In your Keystone (v. 0.2.27 & up) start file 
-
 ```
 var keystone = require('keystone');
-var greeter = require('keystone-greeter');
-
-//replace or update keystone.start() with this
-
-keystone.start({
-	onMount: function() {
-		
-		/* include our greeter pages
-		 * */
-		greeter.add();
-	}
-});
-
-```
-
-**Note:**
-if you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
-```
 var greeter = require('keystone-greeter');
 
 greeter.statics()
@@ -64,7 +44,6 @@ greeter.statics()
 
 keystone.start({
 	onMount: function() {
-		
 		/* include our greeter pages
 		 * */
 		greeter.add();
@@ -72,7 +51,6 @@ keystone.start({
 });
 
 ```
-**You will receive 404 errors if you do not do this and you are less than 0.2.27.**
 
 
 ###Configuration
@@ -187,7 +165,7 @@ A simple string or single element `Array` are the same
 greeter.set('field name', ['name']);
 greeter.set('field name', 'name');
 ```
-and create
+and will create
 ```
 userDoc.name = req.body.name
 ```
