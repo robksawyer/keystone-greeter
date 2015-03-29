@@ -4,8 +4,8 @@
 
 var Text = {
 	build: {
-		release: '0.1.0',
-		name: 'Inqusive Website',
+		release: '0.2.0',
+		name: 'Keystone Greeter',
 		text: 'build',
 	},
 	home: {

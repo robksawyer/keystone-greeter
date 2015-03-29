@@ -33,11 +33,11 @@ html
 		//- JAVASCRIPT
 		script(src='/snowpi/js/lib/jquery/jquery-2.1.1.min.js')
 		script(src='/snowpi/js/lib/bootstrap/bootstrap-3.2.0.min.js')
-		script(src='/snowpi/js/lib/react/build/react-with-addons.js')
+		script(src='/snowpi/js/lib/bower_components/react/react-with-addons.js')
 		script(src='/snowpi/js/lib/bower_components/react-bootstrap/react-bootstrap.min.js')
 		script(src='/snowpi/js/config.js')
 		script(src='/snowpi/js/lib/react/build/greeter.js')
 		script.
 			
-			isMe = '#{csrf_token_value}';isKey = '#{csrf_token_key}';#{emailText ? "Text.home.email = '"+emailText+"'":''};#{usernameText ? "Text.home.username = '"+usernameText+"'":''};#{passwordText ? "Text.home.password = '"+passwordText+"'":''};#{confirmText ? "Text.home.confirm = '"+confirmText+"'":''};#{nameText ? "Text.home.name = '"+nameText+"'":''};#{infoText ? "Text.home.emailnotice = '"+infoText+"'":''};#{logoman ? "Text.logoman = '"+logoman+"'":''};
+			isMe = '#{csrf_token_value}';isKey = '#{csrf_token_key}';#{emailText ? "Text.home.email = '"+emailText+"';":''}#{usernameText ? "Text.home.username = '"+usernameText+"';":''}#{passwordText ? "Text.home.password = '"+passwordText+"';":''}#{confirmText ? "Text.home.confirm = '"+confirmText+"';":''}#{nameText ? "Text.home.name = '"+nameText+"';":''}#{infoText ? "Text.home.emailnotice = '"+infoText+"';":''}#{logoman ? "Text.logoman = '"+logoman+"';":''}
 			

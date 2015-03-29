@@ -1,25 +1,29 @@
 {
-  "name": "snowpi-greeter",
-  "version": "0.1.30",
+  "name": "keystone-greeter",
+  "version": "0.2.0",
   "private": false,
   "description": "Stand-alone signin and registration module for Keystone; built with ReactJS",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/snowkeeper/snowpi-greeter-module"
+    "url": "https://github.com/snowkeeper/keystone-greeter"
   },
   "dependencies": {
-    "keystone": "~0.2.x",
+    "keystone": "~0.3.x",
     "async": "~0.9.0",
     "underscore": "~1.6.0",
     "sanitizer": "",
-    "express": "~3.3.8",
+    "express": "~4.12.3",
     "jade": "~1.5.0"
   },
   "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-react": "^0.12.0",
+    "load-grunt-tasks": "^3.1.0"
   },
   "engines": {
-    "node": ">=0.10.22",
+    "node": ">=0.10.34",
     "npm": ">=1.3.14"
   },
   "author": {
@@ -39,8 +43,7 @@
   "bugs": {
     "url": "https://github.com/snowkeeper/snowpi-greeter-module/issues"
   },
-  "scripts": {
-  },
-  "_id": "snowpi-greeter@0.1.30",
-  "_from": "snowpi-greeter@0.1.26"
+  "scripts": {},
+  "_id": "keystone-greeter@0.2.0",
+  "_from": "snowpi-greeter@0.1.30"
 }

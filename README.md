@@ -1,4 +1,4 @@
-# Snowpi Greeter 
+# Keystone Greeter 
 ### A Keystone signin / registration form (ReactJS)
 
 Built with ReactJS (decent commenting)
@@ -10,26 +10,26 @@ Built with ReactJS (decent commenting)
 ### Install
 
 ```
-npm install snowpi-greeter
+npm install keystone-greeter
 
 //or add to package.json
 "dependencies": {
-	"snowpi-greeter": "~0.1.x"
+	"keystone-greeter": "~0.2.x"
 }
 ```
 
 You can update the controller if you want to use more than 4 registration fields.
 ```
-node_modules/snowpi-greeter/index.js
+node_modules/keystone-greeter/index.js
 ```
 The compiled client ReactJS file is located at:
 ```
-node_modules/snowpi_greeter/public/snowpi/js/lib/react/build/greeter.js
+node_modules/keystone_greeter/public/snowpi/js/lib/react/build/greeter.js
 ``` 
 
 The client jsx is now included at:  
 ```
-node_modules/snowpi_greeter/public/snowpi/js/lib/react/jsx/greeter.js
+node_modules/keystone_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 ``` 
 
 ### Setup
@@ -38,7 +38,7 @@ In your Keystone (v. 0.2.27 & up) start file
 
 ```
 var keystone = require('keystone');
-var greeter = require('snowpi-greeter');
+var greeter = require('keystone-greeter');
 
 //replace or update keystone.start() with this
 
@@ -56,7 +56,7 @@ keystone.start({
 **Note:**
 if you have Keystone < 0.2.27 you must add the static files before `keystone.start()`
 ```
-var greeter = require('snowpi-greeter');
+var greeter = require('keystone-greeter');
 
 greeter.statics()
 
@@ -84,7 +84,7 @@ greeter.set('debug',false)
 
 #####All items need to be set before calling `greeter.add`:
 
-The form submits to `/snowpi-greeter`.  This is a static value.
+The form submits to `/keystone-greeter`.  This is a static value.
 
 The User Model defaults to `keystone.get('user model')`. Override with:
 ```

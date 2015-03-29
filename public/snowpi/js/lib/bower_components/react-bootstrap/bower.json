@@ -1,9 +1,22 @@
 {
   "name": "react-bootstrap",
-  "version": "0.11.1",
+  "version": "0.19.1",
+  "homepage": "http://react-bootstrap.github.io/",
+  "author": "Stephen J. Collings <stevoland@gmail.com>",
+  "license": "MIT",
   "main": [
-    "react-bootstrap.min.js",
-    "index.js"
+    "react-bootstrap.js"
   ],
-  "ignore": []
+  "keywords": [
+    "react",
+    "react-component",
+    "bootstrap"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "react": ">= 0.13.0",
+    "classnames": "1.1.4"
+  }
 }

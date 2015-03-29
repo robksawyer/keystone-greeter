@@ -1,4 +1,4 @@
-var 	keystone = require('keystone'),
+var keystone = require('keystone'),
 	_ = require('underscore'),
 	express = require('express'),
 	fs = require('fs'),
@@ -6,21 +6,16 @@ var 	keystone = require('keystone'),
 	async = require('async'),
 	jade = require('jade'),
 	sanitizer=require('sanitizer'),
-	yes = 'yes', /* true === 'yes' - isTrue = true;  >> will fail; use isTrue = yes*/
-	no = 'no' /* false === 'no'  - isTrue = no;  >> for true false */;
+	yes = 'yes', /* true === 'yes' - isTrue === true;  >> will fail; use isTrue === yes*/
+	no = 'no' /* false === 'no'  - isTrue === no;  >> for truely false */;
 
 var templateCache = {};
 /**
  * grabs the true app root
- * from Keystone:
- * Don't use process.cwd() as it breaks module encapsulation
- * Instead, let's use module.parent if it's present, or the module itself if there is no parent (probably testing keystone directly if that's the case)
- * This way, the consuming app/module can be an embedded node_module and path resolutions will still work
- * (process.cwd() breaks module encapsulation if the consuming app/module is itself a node_module)
  */
 var appRoot = (function(_rootPath) {
 	var parts = _rootPath.split(path.sep);
-	parts.pop(); //get rid of /node_modules from the end of the path
+	parts.pop(); // rid of /node_modules
 	return parts.join(path.sep);
 })(module.parent ? module.parent.paths[0] : module.paths[0]);
 
@@ -35,7 +30,7 @@ var SnowpiGreeter = function() {
 	this.set('new user can admin',false);
 	
 	this.set('greeter',keystone.get('signin url') || '/greeter');
-	this.set('redirect timer',5000);
+	this.set('redirect timer',0);
 	
 	this.set('greeter style',true);
 	this.set('keystone style',true);
@@ -61,33 +56,23 @@ var SnowpiGreeter = function() {
 SnowpiGreeter.prototype.statics = function() {
 	var app = keystone.app;
 	app.use( express.static(__dirname + "/public"));
-	/*
-	 * this was handy but we hit the keystone process too late to use it
-	 * 
-	var statics = keystone.get('static');
-	
-	if(statics && statics instanceof Array) {
-		
-		statics.push(__dirname + "/public")
-	
-	} else if(statics) {
-		
-		var _statics = statics;
-		statics = [_statics,__dirname + "/public"]
-	
-	} else {
-		
-		statics = [__dirname + "/public"]
-		
-	}
-	
-	keystone.set('static',statics);
-	* */
 }
+
+SnowpiGreeter.prototype.public = function() {
+	var static = keystone.get('static');
+	if (!_.isArray(static)) {
+		static = [static]
+	}
+	static.push(__dirname + "/public");
+	keystone.set('static',static);
+	this._public = true;
+}
+
+
 SnowpiGreeter.prototype.add = function(setview) {
 	/* add the greeter page
 	 * */
-	var 	app = keystone.app,
+	var app = keystone.app,
 		view = setview && setview !== undefined ? setview: this.get('greeter') || '/greeter',
 		snowpi = this,
 		userModel = this.get('user model');
@@ -95,7 +80,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 	
 	/* add our static files as an additional directory
 	 * */
-	snowpi.statics();
+	if(!this._public) snowpi.statics();
 	
 	/* middleware to add snowpiResponse
 	 * */
@@ -182,10 +167,9 @@ SnowpiGreeter.prototype.add = function(setview) {
 	
 	/* add the api controller
 	 * */
-	app.post('/snowpi-greeter', 
+	app.post('/greeter-keystone-relay', 
 		publicAPI, //middleware to add api response
 		function(req, res) {
-	
 			if (req.user) {
 				return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message current user'),code:200,data:{},redirect:{path:keystone.get('signin redirect'),when:20000}});
 			}
@@ -355,7 +339,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 				}
 			
 			} else {
-				//no truth for gets, fuck gets
+				//no truth for gets
 				return false;
 			}
 			

@@ -23,7 +23,8 @@
 var yes = 'yes', no = 'no';
 //var yes = true, no = false;
 
-/* you can create a mixin for the interval but i like mine global
+
+/* you could create a mixin for the interval 
  * 
  * we use this for the countdown timer before we redirect a logged 
  * in user.  it is for show only and you can disable it 
@@ -51,28 +52,11 @@ var yes = 'yes', no = 'no';
 	  }
 };
 
-
-/* this is redundant since we include react-boostrap 
- * but a simple example of how to make your own bootstrap components
- * */
-var BootstrapButton = React.createClass({displayName: 'BootstrapButton',
-  render: function() {
-    // transferPropsTo() is smart enough to merge classes provided
-    // to this component.
-    return this.transferPropsTo(
-      React.DOM.button({role: "button"}, 
-        this.props.children
-      )
-    );
-  }
-});
-
-
 /* create flash message 
  * */
 var Flash = ReactBootstrap.Alert;
 
-var SnowpiFlash = React.createClass({displayName: 'SnowpiFlash',
+var SnowpiFlash = React.createClass({displayName: "SnowpiFlash",
 	getInitialState: function() {
 		return {
 			isVisible: true
@@ -87,8 +71,8 @@ var SnowpiFlash = React.createClass({displayName: 'SnowpiFlash',
 
 		var message = this.props.children;
 		return (
-		    Flash({bsStyle: this.props.showclass, onDismiss: this.dismissFlash}, 
-			React.DOM.p(null, message)
+		    React.createElement(Flash, {bsStyle: this.props.showclass, onDismiss: this.dismissFlash}, 
+			React.createElement("p", null, message)
 		    )
 		);
 	},
@@ -104,15 +88,14 @@ var SnowpiFlash = React.createClass({displayName: 'SnowpiFlash',
 /* my little man component
  * simple example
  * */
-var SnowpiMan = React.createClass({displayName: 'SnowpiMan',
+var SnowpiMan = React.createClass({displayName: "SnowpiMan",
 	getDefaultProps: function() {
 		return ({divstyle:{float:'right',}});
 	},
 	
 	render: function() {
-	    
-	    return this.transferPropsTo(
-		React.DOM.div({style: this.props.divstyle, dangerouslySetInnerHTML: {__html: Text.logoman}})
+	    return (
+		React.createElement("div", {style: this.props.divstyle, dangerouslySetInnerHTML: {__html: Text.logoman}})
 	    );
 	}
 });
@@ -123,7 +106,10 @@ var SnowpiMan = React.createClass({displayName: 'SnowpiMan',
  * to include this in your React setup modify componentWillReceiveProps to recieve any default values 
  * 
  * */
-var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
+
+var BootstrapButton = ReactBootstrap.Button;
+
+var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 	mixins: [React.addons.LinkedStateMixin],
 	getInitialState: function() {
 		var now = new Date();
@@ -155,7 +141,7 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 			
 			var pickclass = (this.state.data.success === yes ) ? 'success' : 'warning'; 
 			
-			showflashmessage = SnowpiFlash({showclass: pickclass, cleartimeouts: [SnowpiInterval.timeout], clearintervals: [SnowpiInterval.redirect]}, React.DOM.div({dangerouslySetInnerHTML: {__html: this.state.data.message}}));
+			showflashmessage = React.createElement(SnowpiFlash, {showclass: pickclass, cleartimeouts: [SnowpiInterval.timeout], clearintervals: [SnowpiInterval.redirect]}, React.createElement("div", {dangerouslySetInnerHTML: {__html: this.state.data.message}}));
 			
 			/* if we have an error shake the form.  this is done with the
 			 * has-errors class
@@ -176,87 +162,87 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 		 *  the submit buttons will be disabled until the state of our validation inputs matches the if statement
 		 * 
 		 * */
-		var login =(React.DOM.form({ref: "signin", className: "signin-form", onSubmit: this.handleSubmit}, 
-				React.DOM.h2(null, Text.home.login, " ", SnowpiMan(null)), 
+		var login =(React.createElement("form", {ref: "signin", className: "signin-form", onSubmit: this.handleSubmit}, 
+				React.createElement("h2", null, Text.home.login, " ", React.createElement(SnowpiMan, null)), 
 				showflashmessage, 
 					
-					React.DOM.div({className: this.state.username === '' ? 'input-group has-error':'input-group'}, 
+					React.createElement("div", {className: this.state.username === '' ? 'input-group has-error':'input-group'}, 
 						
-						React.DOM.span({className: "input-group-addon"}, " ", Text.home.username), 
-						React.DOM.input({type: "text", ref: "username", className: "form-control", valueLink: this.linkState('username'), id: "Snowpi-username"})
+						React.createElement("span", {className: "input-group-addon"}, " ", Text.home.username), 
+						React.createElement("input", {type: "text", ref: "username", className: "form-control", valueLink: this.linkState('username'), id: "Snowpi-username"})
 				
 					), 
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
-					React.DOM.div({className: this.state.password === '' ? 'input-group has-error':'input-group'}, 
-						React.DOM.span({className: "input-group-addon"}, " ", Text.home.password), 
-						React.DOM.input({type: "password", ref: "password", className: "form-control", valueLink: this.linkState('password'), id: "Snowpi-givepass"})
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					React.createElement("div", {className: this.state.password === '' ? 'input-group has-error':'input-group'}, 
+						React.createElement("span", {className: "input-group-addon"}, " ", Text.home.password), 
+						React.createElement("input", {type: "password", ref: "password", className: "form-control", valueLink: this.linkState('password'), id: "Snowpi-givepass"})
 						
 					), 
 					
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
 					
-					React.DOM.div({className: "col-xs-6 "}, BootstrapButton({role: "button", onClick: this.login, className: "btn btn-ftc btn-info", disabled: (this.state.username === '' || this.state.password === '' ) ? 'disabled' : ''}, "  ", Text.home.btns.login, " ")), 
+					React.createElement("div", {className: "col-xs-6 "}, React.createElement(BootstrapButton, {role: "button", onClick: this.login, className: "btn btn-info", bsStyle: "primary", disabled: (this.state.username === '' || this.state.password === '' ) ? true : false}, "  ", Text.home.btns.login, " ")), 
 					
-					React.DOM.div({className: "col-xs-6 ", style: {textAlign:'right'}}, BootstrapButton({onClick: this.showregister, className: "btn btn-ftc btn-warning"}, "  ", Text.home.btns.register, " ")), 
+					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {onClick: this.showregister, bsStyle: "warning", className: "btn btn-warning"}, "  ", Text.home.btns.register, " ")), 
 					
-					React.DOM.div({className: "clearfix"})
+					React.createElement("div", {className: "clearfix"})
 			));
 		
-		var register =(React.DOM.form({ref: "signin", className: "signin-form", onSubmit: this.handleSubmit}, 
-				React.DOM.h2(null, Text.home.register, " ", SnowpiMan(null)), 
+		var register =(React.createElement("form", {ref: "signin", className: "signin-form", onSubmit: this.handleSubmit}, 
+				React.createElement("h2", null, Text.home.register, " ", React.createElement(SnowpiMan, null)), 
 				showflashmessage, 
 					
-					React.DOM.div({className: this.state.username === '' ? "input-group has-error":"input-group"}, 
+					React.createElement("div", {className: this.state.username === '' ? "input-group has-error":"input-group"}, 
 						
-						React.DOM.span({className: "input-group-addon"}, " ", Text.home.username), 
-						React.DOM.input({type: "text", ref: "username", className: "form-control", valueLink: this.linkState('username'), id: "Snowpi-username"})
+						React.createElement("span", {className: "input-group-addon"}, " ", Text.home.username), 
+						React.createElement("input", {type: "text", ref: "username", className: "form-control", valueLink: this.linkState('username'), id: "Snowpi-username"})
 				
 					), 
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
-					React.DOM.div({className: (this.state.confirm === '' || this.state.password === '' || this.state.confirm !== this.state.password ) ? 'input-group has-error':'input-group'}, 
-						React.DOM.span({className: "input-group-addon"}, " ", Text.home.password), 
-						React.DOM.input({type: "password", ref: "password", className: "form-control", valueLink: this.linkState('password'), id: "Snowpi-givepass"})
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					React.createElement("div", {className: (this.state.confirm === '' || this.state.password === '' || this.state.confirm !== this.state.password ) ? 'input-group has-error':'input-group'}, 
+						React.createElement("span", {className: "input-group-addon"}, " ", Text.home.password), 
+						React.createElement("input", {type: "password", ref: "password", className: "form-control", valueLink: this.linkState('password'), id: "Snowpi-givepass"})
 						
 					), 
 					
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
-					React.DOM.div({className: (this.state.confirm === '' || this.state.password === '' || this.state.confirm !== this.state.password ) ? 'input-group has-error':'input-group'}, 
-						React.DOM.span({className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.confirm}}), 
-						React.DOM.input({type: "password", ref: "confirm", className: "form-control", valueLink: this.linkState('confirm'), id: "Snowpi-confirm"})
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					React.createElement("div", {className: (this.state.confirm === '' || this.state.password === '' || this.state.confirm !== this.state.password ) ? 'input-group has-error':'input-group'}, 
+						React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.confirm}}), 
+						React.createElement("input", {type: "password", ref: "confirm", className: "form-control", valueLink: this.linkState('confirm'), id: "Snowpi-confirm"})
 						
 					), 
 					
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
-					React.DOM.div({className: "form-group"}, 
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					React.createElement("div", {className: "form-group"}, 
 					   
-					    React.DOM.div({className: "col-sm-12"}, 
-					      React.DOM.p({className: "form-control-static"}, Text.home.emailnotice)
+					    React.createElement("div", {className: "col-sm-12"}, 
+					      React.createElement("p", {className: "form-control-static"}, Text.home.emailnotice)
 					    )
 					 ), 
 					
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
-					React.DOM.div({className: "input-group "}, 
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					React.createElement("div", {className: "input-group "}, 
 						
-						React.DOM.span({className: "input-group-addon"}, " ", Text.home.name), 
-						React.DOM.input({type: "text", ref: "name", className: "form-control", defaultValue: "", id: "Snowpi-name"})
+						React.createElement("span", {className: "input-group-addon"}, " ", Text.home.name), 
+						React.createElement("input", {type: "text", ref: "name", className: "form-control", defaultValue: "", id: "Snowpi-name"})
 				
 					), 
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
-					React.DOM.div({className: "input-group"}, 
-						React.DOM.span({className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.email}}), 
-						React.DOM.input({type: "email", ref: "email", className: "form-control", defaultValue: "", id: "Snowpi-email"})
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					React.createElement("div", {className: "input-group"}, 
+						React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.email}}), 
+						React.createElement("input", {type: "email", ref: "email", className: "form-control", defaultValue: "", id: "Snowpi-email"})
 						
 					), 
 					
-					React.DOM.div({className: "clearfix"}, React.DOM.br(null)), 
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
 					
-					React.DOM.div({className: "col-xs-6 ", style: {textAlign:'left'}}, BootstrapButton({onClick: this.register, ref: "registerbutton", 'data-loading-text': "Registering...", role: "button", className: "btn btn-ftc btn-warning", disabled: (this.state.username === '' || this.state.password === '' || this.state.confirm === '' || this.state.confirm !== this.state.password) ? 'disabled' : ''}, "  ", Text.home.btns.register, " ")), 
+					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'left'}}, React.createElement(BootstrapButton, {onClick: this.register, ref: "registerbutton", "data-loading-text": "Registering...", role: "button", bsStyle: "warning", className: "btn  btn-warning", disabled: (this.state.username === '' || this.state.password === '' || this.state.confirm === '' || this.state.confirm !== this.state.password) ? true : false}, "  ", Text.home.btns.register, " ")), 
 					
-					React.DOM.div({className: "col-xs-6 ", style: {textAlign:'right'}}, BootstrapButton({role: "button", onClick: this.showregister, className: "btn btn-ftc btn-default"}, "  ", Text.home.btns.logincurrent, " ")), 
-					React.DOM.div({className: "clearfix"})
+					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {role: "button", onClick: this.showregister, className: "btn btn-default"}, "  ", Text.home.btns.logincurrent, " ")), 
+					React.createElement("div", {className: "clearfix"})
 			));	   
 		
-		return ( React.DOM.div({className: loginORregister + " centerme col-xs-12 shakeme " + haserror}, this.state.register===no?login:register, " "));
+		return ( React.createElement("div", {className: loginORregister + " centerme col-xs-12 shakeme " + haserror}, this.state.register===no?login:register, " "));
 	},
 	componentDidMount: function() {
 		// When the component is added let me know
@@ -292,7 +278,7 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 		var btn = $(this.refs.registerbutton.getDOMNode())
 		btn.button('loading')
 		$.ajax({
-			url: '/snowpi-greeter',
+			url: '/greeter-keystone-relay',
 			dataType: 'json',
 			method: 'post',
 			data: mydata,
@@ -322,7 +308,7 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 						_self.setState({response:yes,data:data});
 					},1000);
 					
-					/* kill the interval and redirect once the timeout reaces
+					/* kill the interval and redirect on the timeout 
 					 * */
 					SnowpiInterval.timeout = setTimeout(function(){
 						SnowpiInterval.clearIntervals(SnowpiInterval.redirect);
@@ -344,7 +330,7 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 			}.bind(this),
 			
 			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
+				console.log(this.props.url, status, err.toString());
 				this.setState({response:yes,data: {status:status,err:err.toString()} });
 			}.bind(this)
 		
@@ -354,15 +340,12 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 			
 			btn.button('reset');
 		});
-		/* always return false if your requestor isnt expecting a value
-		*  just a good habit i am trying to make myself learn
-		* */
-		return false;
+		
 	},
 	login: function() {
 		/* same as register but less info sent
 		 * you could combine them both if you like less code
-		 * */	
+		 * */
 		var mydata = {login:'yes'};
 		this.setState({response:no});
 		mydata.username = this.refs.username.getDOMNode().value.trim()
@@ -370,7 +353,7 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 		mydata[isKey] = isMe;
 		
 		$.ajax({
-			url: '/snowpi-greeter',
+			url: '/greeter-keystone-relay',
 			dataType: 'json',
 			method: 'post',
 			data: mydata,
@@ -403,19 +386,16 @@ var SnowpiLogin = React.createClass({displayName: 'SnowpiLogin',
 				this.setState({response:yes,data:data});
 			}.bind(this),
 			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
+				console.log(err, status, err.toString());
 				this.setState({response:yes,data: {status:status,err:err.toString()} });
 			}.bind(this)
-		});
-		
-		return false;
-		
-	},
+		});		
+	}
 });
 
 $(function() {
-	
+	//console.log('react',React);
 	/* start our app after the page is ready */ 	
-	React.renderComponent(SnowpiLogin(null), document.getElementById('snowpi'));
+	React.render(React.createElement(SnowpiLogin, null), document.getElementById('snowpi'));
 
 });
