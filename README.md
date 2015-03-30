@@ -3,13 +3,13 @@
 
 Built with ReactJS (decent commenting)
 
-[Demo - styled](https://code.snowpi.org/signin) <br />
-[Demo - un-styled](https://code.snowpi.org/greeter)
+[Demo - styled](http://code.snowpi.org/signin) <br />
+[Demo - un-styled](http://code.snowpi.org/greeter)
 
 
 ### Install
 
-```
+```javascript
 npm install keystone-greeter
 
 //or add to package.json
@@ -19,22 +19,22 @@ npm install keystone-greeter
 ```
 
 You can update the controller if you want to use more than 4 registration fields.
-```
+```javascript
 node_modules/keystone-greeter/index.js
 ```
 The compiled client ReactJS file is located at:
-```
+```javascript
 node_modules/keystone_greeter/public/snowpi/js/lib/react/build/greeter.js
 ``` 
 
 The client jsx is now included at:  
-```
+```javascript
 node_modules/keystone_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 ``` 
 
 ### Setup
 
-```
+```javascript
 var keystone = require('keystone');
 var greeter = require('keystone-greeter');
 
@@ -53,22 +53,22 @@ keystone.start({
 ```
 
 
-###Configuration
+### Configuration
 
 debug
-```
+```javascript
 greeter.set('debug',false)
 ```
 
-#####All items need to be set before calling `greeter.add`:
+##### All items need to be set before calling `greeter.add`:
 
 The User Model defaults to `keystone.get('user model')`. Override with:
-```
+```javascript
 greeter.set('user model','myUsers')
 ```
 
 The greeter uri defaults to `/greeter` and can be set 3 ways in overriding order:
-```
+```javascript
 keystone.set('sign url','/greeter') 
 
 greeter.set('greeter','/greeter') //this overrides keystone.set
@@ -78,15 +78,15 @@ greeter.add('/greeter') //this overrides everything
 ```
 
 The success redirect page is inherited from Keystone
-```
+```javascript
 //set the redirect 
 keystone.set('signin redirect','/')
 ```
 Set the redirect timer for successful login or registration in milliseconds
-```
+```javascript
 greeter.set('redirect timer',0) //default = 5000 (5 seconds)
 ```
-####Style Sheets
+#### Style Sheets
 Control the stylesheets 
 
 ```javascript
@@ -96,11 +96,11 @@ greeter.set('custom style','/styles/custom.css'), // include custom css
 ```
 The default is to include default greeter css first and `/styles/site.min.css` second so that your css automatically overrides the greeter out of the box.  Custom styles is false unless explicitly set.
 
-####Registration
+#### Registration
 
 
 User registration can be toggled before calling `greeter.add`:
-```
+```javascript
 //these are the default values
 greeter.set('allow register', true),
 greeter.set('new user can admin', false),
@@ -110,7 +110,7 @@ greeter.set('new user can admin', false),
 Assign the form fields to your model fields. 
 
 The first signin form field is  **username**. We will use this to check signins.
-```
+```javascript
 //these are the default values
 	greeter.set('field username', 'email');
 	greeter.set('field password', 'password');
@@ -119,7 +119,7 @@ The first signin form field is  **username**. We will use this to check signins.
 ```
 
 There is a 4th input available if you use usernames instead of emails to login.  
-```
+```javascript
 //this would change to using a true username
 	greeter.set('field username', 'email');
 	greeter.set('field password', 'password');
@@ -135,12 +135,12 @@ realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
 
 The **` name `** form field is a special case. 
 It can be a `String` or an `Array`.  An `Array` will be used to form a new `Object`:
-```
+```javascript
 greeter.set('field name', ['name','first','last'])
 
 ```
 wll create
-```
+```javascript
 var splitName = req.body.name.split(' ');
 
 ... other stuff ...
@@ -151,26 +151,26 @@ userDoc.name = {
 }
 ```
 A two element `Array` creates an object without the `split()`
-```
+```javascript
 greeter.set('field name', ['person','name'])
 ```
 wll create
-```
+```javascript
 userDoc.person = {
 	name: req.body.name
 }
 ```
 A simple string or single element `Array` are the same
-```
+```javascript
 greeter.set('field name', ['name']);
 greeter.set('field name', 'name');
 ```
 and will create
-```
+```javascript
 userDoc.name = req.body.name
 ```
 
-####Form Text
+#### Form Text
 Change the default form labels to match your model 
 ```javascript
 	greeter.set('username label','This is the login input and first register input'),
@@ -185,9 +185,9 @@ Change the default form labels to match your model
 	
 ```
 
-####Return Messages
+#### Return Messages
 Change the return message contents
-```
+```javascript
 	greeter.set('message valid credentials', 'a valid username and password are required');
 	greeter.set('message welcome', 'Welcome back {user}. ');
 	greeter.set('message welcome login', 'Welcome back.  Please signin');
