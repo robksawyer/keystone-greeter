@@ -30,7 +30,7 @@ var yes = 'yes', no = 'no';
  * in user.  it is for show only and you can disable it 
  * by sending a redirect time of 0
  * */
- SnowpiInterval = {
+var SnowpiInterval = {
 	  intervals: [],
 	  setInterval: function() {
 		return this.intervals.push(setInterval.apply(null, arguments));
@@ -85,7 +85,7 @@ var SnowpiFlash = React.createClass({
 	}
 });
 
-/* my little man component
+/* man component
  * simple example
  * */
 var SnowpiMan = React.createClass({
@@ -95,7 +95,20 @@ var SnowpiMan = React.createClass({
 	
 	render: function() {
 	    return (
-		<div style={this.props.divstyle} dangerouslySetInnerHTML={{__html: Text.logoman}} />
+		<div style={this.props.divstyle} dangerouslySetInnerHTML={{__html: Text.logoman || ''}} />
+	    );
+	}
+});
+
+/* login
+ * simple example
+ * */
+var SnowpiFormLogin = React.createClass({
+
+	
+	render: function() {
+	    return (
+		<div style={this.props.divstyle} dangerouslySetInnerHTML={{__html: Text.logoman || ''}} />
 	    );
 	}
 });
@@ -141,7 +154,7 @@ var SnowpiLogin = React.createClass({
 			
 			var pickclass = (this.state.data.success === yes ) ? 'success' : 'warning'; 
 			
-			showflashmessage = <SnowpiFlash showclass={pickclass} cleartimeouts={[SnowpiInterval.timeout]} clearintervals={[SnowpiInterval.redirect]}><div dangerouslySetInnerHTML={{__html: this.state.data.message}} /></SnowpiFlash >;
+			showflashmessage = <SnowpiFlash showclass={pickclass} cleartimeouts={[SnowpiInterval.timeout]} clearintervals={[SnowpiInterval.redirect]}><div dangerouslySetInnerHTML={{__html: this.state.data.message || ''}} /></SnowpiFlash >;
 			
 			/* if we have an error shake the form.  this is done with the
 			 * has-errors class
@@ -181,13 +194,69 @@ var SnowpiLogin = React.createClass({
 					
 					<div className="clearfix" ><br /></div>
 					
-					<div className="col-xs-6 "  ><BootstrapButton role="button" onClick={this.login}  className="btn btn-info"  bsStyle='primary' disabled={(this.state.username === '' || this.state.password === '' ) ? true : false}>  {Text.home.btns.login} </BootstrapButton></div> 
+					<div className="col-xs-6 "  ><BootstrapButton role="button" onClick={this.login}  bsStyle='info' disabled={(this.state.username === '' || this.state.password === '' ) ? true : false}>  {Text.home.btns.login} </BootstrapButton></div> 
 					
-					<div className="col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton onClick={this.showregister}  bsStyle='warning' className="btn btn-warning">  {Text.home.btns.register} </BootstrapButton></div> 
+					<div className="col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton onClick={this.showregister}  bsStyle='warning'>  {Text.home.btns.register} </BootstrapButton></div> 
+					
+					<div className="clearfix" ><br /></div>
+					
+					<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton role="button" onClick={this.changeReset}  bsStyle='default' >  {Text.home.btns.reset} </BootstrapButton></div> 
 					
 					<div className="clearfix" ></div>
 			</form>);
 		
+		var reset =(<form  ref='signin'  className="signin-form"  onSubmit={this.handleSubmit} >
+				<h2>{Text.home.reset} <SnowpiMan /></h2>
+				{showflashmessage}
+					
+					<div className={this.state.username === '' ? 'input-group has-error':'input-group'}>
+						
+						<span className="input-group-addon"> {Text.home.resetemail}</span>
+						<input type="text" ref="resetemail" className="form-control"  valueLink={this.linkState('resetemail')} id="Snowpi-resetemail"  />
+				
+					</div>
+					
+					<div className="clearfix" ><br /></div>
+					
+					<div className="col-xs-6 "  ><BootstrapButton role="button" onClick={this.resetemail} ref="resetbutton" bsStyle='info' disabled={(this.state.email === '' ) ? true : false}  data-loading-text="Checking..." >  {Text.home.btns.resetpass} </BootstrapButton></div> 
+					
+					<div className="col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton onClick={this.changeReset}  bsStyle='default'>  {Text.home.btns.logincurrent} </BootstrapButton></div> 
+					<div className="clearfix" ></div>
+			</form>);
+		
+		var securityQuestions = Text.registerSecurityQuestions.map(function(val) {
+			var options = val.questions.map(function(op, key) {
+				return (
+					<option key={key} value={op}>{op}</option>
+				);
+			});
+			return (
+				<div className="input-group" key={val.name}>
+					<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: val.label || ''}} /> 
+					<select ref={val.field + '_select'} className="form-control" >
+						{options}
+					</select>
+					<input type="text" ref={val.field} placeholder={val.placeholder || Text.home.securityPlaceholder} className="form-control"  valueLink={this.linkState(val.field)} />
+				</div>
+			);
+		}.bind(this));
+		if(securityQuestions.length === 0) {
+			var questions = '';
+		} else {
+			var questions = (
+				<div>
+				<div className="clearfix" ><br /></div>
+				<div className="form-group">
+					   
+					<div className="col-sm-12">
+						<p className="form-control-static">{Text.home.securityHeader}</p>
+					</div>
+				</div>
+				<div className="clearfix" ><br /></div>
+				{securityQuestions}
+				</div>
+			);
+		}
 		var register =(<form  ref='signin'  className="signin-form"   onSubmit={this.handleSubmit}>
 				<h2>{Text.home.register} <SnowpiMan /></h2>
 				{showflashmessage}
@@ -207,7 +276,7 @@ var SnowpiLogin = React.createClass({
 					
 					<div className="clearfix" ><br /></div>
 					<div className={(this.state.confirm === '' || this.state.password === '' || this.state.confirm !== this.state.password ) ? 'input-group has-error':'input-group'}>
-						<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: Text.home.confirm}} /> 
+						<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: Text.home.confirm || ''}} /> 
 						<input type="password" ref="confirm" className="form-control"  valueLink={this.linkState('confirm')} id="Snowpi-confirm"  />
 						
 					</div>
@@ -229,10 +298,12 @@ var SnowpiLogin = React.createClass({
 					</div>
 					<div className="clearfix" ><br /></div>
 					<div className="input-group">
-						<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: Text.home.email}} /> 
+						<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: Text.home.email || ''}} /> 
 						<input type="email" ref="email" className="form-control"  defaultValue='' id="Snowpi-email"  />
 						
 					</div>
+					
+					{questions}
 					
 					<div className="clearfix" ><br /></div>
 					
@@ -240,9 +311,9 @@ var SnowpiLogin = React.createClass({
 					
 					<div className="col-xs-6 "   style={{textAlign:'right'}} ><BootstrapButton role="button" onClick={this.showregister}  className="btn btn-default">  {Text.home.btns.logincurrent} </BootstrapButton></div>
 					<div className="clearfix" ></div>
-			</form>);	   
+			</form>);
 		
-		return ( <div  className={loginORregister + " centerme col-xs-12 shakeme " + haserror}>{this.state.register===no?login:register} </div>);
+		return ( <div  className={loginORregister + " centerme col-xs-12 shakeme " + haserror}>{this.state.resetform===yes ? reset : this.state.register===no ? login : register} </div>);
 	},
 	componentDidMount: function() {
 		// When the component is added let me know
@@ -255,12 +326,54 @@ var SnowpiLogin = React.createClass({
 		this.setState({register: this.state.register===yes?no:yes,response:no})
 		return false;
 	},
-	handleSubmit: function() {
-		/* like preventDefault()
-		 * this is attached to the form element with onSubmit={this.handleSubmit}
-		 * our login / register buttons submit
+	changeReset: function (e) {
+		/* toggle the password reset
 		 * */
-		return false;
+		this.setState({resetform: this.state.resetform===yes?no:yes,response:no})
+		return e.preventDefault();
+	},
+	handleSubmit: function(e) {
+		return e.preventDefault();
+	},
+	resetemail: function() {
+		/* validation occurs as input is received 
+		 * this method should only be avialable if
+		 * all validation is already met so just run
+		 * */
+		var mydata = {reset:'yes'};
+		this.setState({response:no});
+		mydata.email = this.refs.resetemail.getDOMNode().value.trim()
+		mydata[isKey] = isMe;
+		var btn = $(this.refs.resetbutton.getDOMNode())
+		btn.button('loading')
+		$.ajax({
+			url: '/greeter-reset-password',
+			dataType: 'json',
+			method: 'post',
+			data: mydata,
+			success: function(data) {
+							
+				function message() {
+					data.message = 'Success';
+				}
+				/* flash messages are shown with response : yes
+				 * */	
+				this.setState({response:yes,data:data,resetform:no});
+				
+			}.bind(this),
+			
+			error: function(xhr, status, err) {
+				console.log(this.props.url, status, err.toString());
+				this.setState({response:yes,resetform:no,data: {status:status,err:err.toString()} });
+			}.bind(this)
+		
+		/* always reset our buttons
+		* */	
+		}).always(function () {
+			
+			btn.button('reset');
+		});
+		
 	},
 	register: function() {
 		/* validation occurs as input is received 
@@ -275,6 +388,10 @@ var SnowpiLogin = React.createClass({
 		mydata.email = this.refs.email.getDOMNode().value.trim()
 		mydata.name = this.refs.name.getDOMNode().value.trim()
 		mydata[isKey] = isMe;
+		Text.registerSecurityQuestions.forEach(function(val) {
+			mydata[val.field] = this.refs[val.field].getDOMNode().value.trim();
+			mydata[val.field + '_select'] = this.refs[val.field + '_select'].getDOMNode().value.trim()
+		}.bind(this));
 		var btn = $(this.refs.registerbutton.getDOMNode())
 		btn.button('loading')
 		$.ajax({
@@ -334,7 +451,7 @@ var SnowpiLogin = React.createClass({
 				this.setState({response:yes,data: {status:status,err:err.toString()} });
 			}.bind(this)
 		
-		/* neat little trick to always reset our buttons
+		/*  always reset our buttons
 		* */	
 		}).always(function () {
 			

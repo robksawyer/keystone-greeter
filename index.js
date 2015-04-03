@@ -1,11 +1,13 @@
 var keystone = require('keystone'),
-	_ = require('underscore'),
+	_ = require('lodash'),
 	express = require('express'),
 	fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
 	jade = require('jade'),
 	sanitizer=require('sanitizer'),
+	config = require('./lib/config.js'),
+	debug = require('debug')('greeter'),
 	yes = 'yes', /* true === 'yes' - isTrue === true;  >> will fail; use isTrue === yes*/
 	no = 'no' /* false === 'no'  - isTrue === no;  >> for truely false */;
 
@@ -25,7 +27,13 @@ var SnowpiGreeter = function() {
 	this._options = {}
 	/* set the module variables
 	 * */	
+	this._defaults();
+}
+
+SnowpiGreeter.prototype._defaults = function() {
+		
 	this.set('user model',keystone.get('user model') || 'User');
+	
 	this.set('allow register',true);
 	this.set('new user can admin',false);
 	
@@ -35,10 +43,44 @@ var SnowpiGreeter = function() {
 	this.set('greeter style',true);
 	this.set('keystone style',true);
 	
-	this.set('field username', 'email');
-	this.set('field password', 'password');
-	this.set('field name', ['name','first','last']);
-	this.set('field email', false);
+	this.setField('field username', 'email');
+	this.setField('field password', 'password');
+	this.setField('field name', ['name','first','last']);
+	this.setField('field email', false);
+	this.setField('field security', {
+		'placeholder': 'answer',
+		'label': 'Answer the following questions for password reset options.'
+	});
+	this.setField('field info', {
+		'label': 'A name and email are optional.  Supplying an email is the only way to reset a lost password'
+	});
+	
+	this.setField('field reset questions', [
+		{
+			field: 'q1',
+			answer: 'q1Answer',
+			label: 'Question 1',
+			placeholder: 'answer',
+			questions: [
+				'Mothers maiden name',
+				'Fathers middle name',
+				'Hospital you were born in',
+				'House number you grew up in'
+			]
+		},
+		{
+			field: 'q2',
+			answer: 'q2Answer',
+			label: 'Question 2',
+			placeholder: 'answer question 2',
+			questions: [
+				'Favorite Color',
+				'Favorite Dog Breed',
+				'Do you cat?',
+				'Your first phone number'
+			]
+		}
+	]);
 	
 	this.set('message valid credentials', 'a valid username and password are required');
 	this.set('message welcome', 'Welcome back {user}. ');
@@ -49,9 +91,30 @@ var SnowpiGreeter = function() {
 	this.set('message username taken', 'the username requested is not available');
 	this.set('message failed register', 'there was a problem creating your new account.');
 	this.set('message register all fields', 'please fill in username, password and password again...');
+	this.set('message reset email sent', 'check your email.  reset instructions have been sent.');
+	
+	this._emailDefaults();
 }
 
+SnowpiGreeter.prototype.setField = function(field,options) {
+	if(_.isString(options)) {
+		options = {
+			'label': options,
+			'field': options,
+		}
+	}
+	
+	this.set(field,options);
+	
+}
 
+SnowpiGreeter.prototype._emailDefaults = function() {
+	
+	this.set('emails from name', keystone.get('name'));
+	this.set('emails from email', 'info@inquisive.com');
+	this.set('emails reset subject', 'Reset password request from ' + keystone.get('name'));
+	this.set('emails template', '<div>A request has been made to reset your password on ' + keystone.get('name') + '.</div> <div> If this is an error ignore this email.</div><div><br /><a href="{link}">Visit this link to reset your password.</a></div>');
+}
 
 SnowpiGreeter.prototype._statics = function() {
 	var app = keystone.app;
@@ -68,6 +131,13 @@ SnowpiGreeter.prototype.statics = function() {
 	this._public = true;
 }
 
+SnowpiGreeter.prototype.resetQuestion = function(options) {
+	if(_.isObject(options) && options.name && _.isArray(options.questions)) {
+		this._options['field reset questions'].push(options);
+		debug('set field reset questions');
+		debug(this._options['field reset questions']);
+	}
+}
 
 SnowpiGreeter.prototype.add = function(setview) {
 	/* add the greeter page
@@ -77,6 +147,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 		snowpi = this,
 		userModel = this.get('user model');
 	
+	this._emailDefaults();
 	
 	/* add our static files as an additional directory
 	 * */
@@ -138,13 +209,13 @@ SnowpiGreeter.prototype.add = function(setview) {
 			var locals = {
 				env: keystone.get('env'),
 				brand: keystone.get('name'),
-				emailText: snowpi.get('email label'),
-				usernameText: snowpi.get('username label'),
-				passwordText: snowpi.get('password label'),
-				confirmText: snowpi.get('confirm label'),
+				emailText: snowpi.get('field email').label,
+				usernameText: snowpi.get('field username').label,
+				passwordText: snowpi.get('field password').label,
+				confirmText: snowpi.get('field confirm').label,
 				logoman: snowpi.get('logoman'),
-				nameText: snowpi.get('name label'),
-				infoText: snowpi.get('info label'),
+				nameText: snowpi.get('field name').label,
+				infoText: snowpi.get('field info').label,
 				greeterStyle: snowpi.get('greeter style'),
 				keystoneStyle: snowpi.get('keystone style'),
 				customStyle: snowpi.get('custom style'),
@@ -167,6 +238,53 @@ SnowpiGreeter.prototype.add = function(setview) {
 	
 	/* add the api controller
 	 * */
+	app.post('/greeter-reset-password',
+		publicAPI, //middleware to add api response
+		function(req,res) {
+			
+			/* set up Email */
+			var Email = new keystone.Email({ 
+				templateMandrillName: 'reset-pass',
+				templateMandrillContent: [
+					{
+						"name": "header",
+						"content": "<h2>" + keystone.get('name') + "</h2>"
+					}
+				],
+				templateName: 'reset-pass',
+				//customCompileTemplate: function(callback) {
+				//	callback(null, snowpi.get('emails template').replace('{link}', req.protocol + '://' + req.get('host') + view + '?courier=4567890'));
+				//}
+			});
+			//Email.templateForceHtml = true;
+			Email.send({
+				to: req.body.email,
+				from: {
+					name: snowpi.get('emails from name'),
+					email: snowpi.get('emails from email')
+				},
+				subject: snowpi.get('emails reset subject'),
+				templateMandrillContent: [
+					{
+						"name": "main",
+						"content": snowpi.get('emails template').replace('{link}', req.protocol + '://' + req.get('host') + view + '?courier=4567890')
+					}
+				],
+				mandrillOptions: {
+					track_opens: false,
+					track_clicks: false,
+					preserve_recipients: false,
+					inline_css: true
+				},
+			}, 
+			function(err, info) {
+				if (snowpi.get('debug') && err) console.log(err);
+				//console.log(info);
+				res.snowpiResponse({action:'greeter',command:'reset',success:'yes',message:snowpi.get('message reset email sent'),code:401,data:{}});
+			});
+		
+		}
+	);
 	app.post('/greeter-keystone-relay', 
 		publicAPI, //middleware to add api response
 		function(req, res) {
@@ -296,12 +414,22 @@ SnowpiGreeter.prototype.add = function(setview) {
 									}
 								}
 								if(snowpi.get('field username'))
-									userData[snowpi.get('field username')] = req.body.username
+									userData[snowpi.get('field username').field] = req.body.username
 								if(snowpi.get('field password'))
-									userData[snowpi.get('field password')] = req.body.password
+									userData[snowpi.get('field password').field] = req.body.password
 								if(snowpi.get('field email'))
-									userData[snowpi.get('field email')] = req.body.email
+									userData[snowpi.get('field email').field] = req.body.email
 								userData.isAdmin = snowpi.get('new user can admin')
+								
+								// security questions
+								var sq = snowpi.get('field reset questions');
+								if(_.isArray(sq) && sq.length > 0) {
+									userData.questions = {};
+									sq.forEach(function (val) {
+										userData.questions[val.field] = req.body[val.field + '_select']
+										userData.questions[val.answer] = req.body[val.field]
+									});
+								}
 								
 								var User = keystone.list(userModel).model,
 									newUser = new User(userData);
@@ -345,6 +473,46 @@ SnowpiGreeter.prototype.add = function(setview) {
 			
 		}
 	); //end app.post
+	
+	app.get('/greeter_keystone.js',
+		function(req, res) {
+			
+			config.registerSecurityQuestions = !snowpi.get('field security') ? false : _.isArray(snowpi.get('field reset questions')) ? snowpi.get('field reset questions') : false;
+			var root = {
+				name: keystone.get('name'),
+				logoman: snowpi.get('logoman'),
+				host: req.get('host'),
+				signout: keystone.get('signout url'),
+				brand: keystone.get('brand'),
+				csrf_token_key: keystone.security.csrf.TOKEN_KEY,
+				csrf_token_value: keystone.security.csrf.getToken(req, res),
+				csrf_query: '&' + keystone.security.csrf.TOKEN_KEY + '=' + keystone.security.csrf.getToken(req, res),
+			};
+			root.home = {
+				email: snowpi.get('field email'),
+				username: snowpi.get('field username'),
+				password: snowpi.get('field password'),
+				confirm: snowpi.get('field confirm'),
+				name: snowpi.get('field name'),
+				emailnotice: snowpi.get('field info'),
+				securityHeader: snowpi.get('field security').label,
+				securityPlaceholder: snowpi.get('field security').placeholder
+			}
+			//debug(config);
+			var cfg = _.merge(config, root);
+			//cfg.home = _.defaults(root.home, config.home);
+			var vars = JSON.stringify(cfg);
+			var send = 'var isMe = "' + root.csrf_token_value + '";var isKey = "' + root.csrf_token_key + '";var Text = ' + vars + ';';
+			var send = send + 'console.log(Text);';
+			res.setHeader('Content-Type', 'text/javascript');
+			debug('send config in /greeter-keystone.js');
+			debug(cfg);
+			res.send(send);
+			//res.write(send);
+			//res.end();
+		}
+	);
+	
 }
 
 

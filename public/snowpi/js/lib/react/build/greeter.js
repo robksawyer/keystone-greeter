@@ -30,7 +30,7 @@ var yes = 'yes', no = 'no';
  * in user.  it is for show only and you can disable it 
  * by sending a redirect time of 0
  * */
- SnowpiInterval = {
+var SnowpiInterval = {
 	  intervals: [],
 	  setInterval: function() {
 		return this.intervals.push(setInterval.apply(null, arguments));
@@ -85,7 +85,7 @@ var SnowpiFlash = React.createClass({displayName: "SnowpiFlash",
 	}
 });
 
-/* my little man component
+/* man component
  * simple example
  * */
 var SnowpiMan = React.createClass({displayName: "SnowpiMan",
@@ -95,7 +95,20 @@ var SnowpiMan = React.createClass({displayName: "SnowpiMan",
 	
 	render: function() {
 	    return (
-		React.createElement("div", {style: this.props.divstyle, dangerouslySetInnerHTML: {__html: Text.logoman}})
+		React.createElement("div", {style: this.props.divstyle, dangerouslySetInnerHTML: {__html: Text.logoman || ''}})
+	    );
+	}
+});
+
+/* login
+ * simple example
+ * */
+var SnowpiFormLogin = React.createClass({displayName: "SnowpiFormLogin",
+
+	
+	render: function() {
+	    return (
+		React.createElement("div", {style: this.props.divstyle, dangerouslySetInnerHTML: {__html: Text.logoman || ''}})
 	    );
 	}
 });
@@ -141,7 +154,7 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 			
 			var pickclass = (this.state.data.success === yes ) ? 'success' : 'warning'; 
 			
-			showflashmessage = React.createElement(SnowpiFlash, {showclass: pickclass, cleartimeouts: [SnowpiInterval.timeout], clearintervals: [SnowpiInterval.redirect]}, React.createElement("div", {dangerouslySetInnerHTML: {__html: this.state.data.message}}));
+			showflashmessage = React.createElement(SnowpiFlash, {showclass: pickclass, cleartimeouts: [SnowpiInterval.timeout], clearintervals: [SnowpiInterval.redirect]}, React.createElement("div", {dangerouslySetInnerHTML: {__html: this.state.data.message || ''}}));
 			
 			/* if we have an error shake the form.  this is done with the
 			 * has-errors class
@@ -181,13 +194,69 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 					
 					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
 					
-					React.createElement("div", {className: "col-xs-6 "}, React.createElement(BootstrapButton, {role: "button", onClick: this.login, className: "btn btn-info", bsStyle: "primary", disabled: (this.state.username === '' || this.state.password === '' ) ? true : false}, "  ", Text.home.btns.login, " ")), 
+					React.createElement("div", {className: "col-xs-6 "}, React.createElement(BootstrapButton, {role: "button", onClick: this.login, bsStyle: "info", disabled: (this.state.username === '' || this.state.password === '' ) ? true : false}, "  ", Text.home.btns.login, " ")), 
 					
-					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {onClick: this.showregister, bsStyle: "warning", className: "btn btn-warning"}, "  ", Text.home.btns.register, " ")), 
+					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {onClick: this.showregister, bsStyle: "warning"}, "  ", Text.home.btns.register, " ")), 
+					
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					
+					React.createElement("div", {className: "col-xs-offset-6 col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {role: "button", onClick: this.changeReset, bsStyle: "default"}, "  ", Text.home.btns.reset, " ")), 
 					
 					React.createElement("div", {className: "clearfix"})
 			));
 		
+		var reset =(React.createElement("form", {ref: "signin", className: "signin-form", onSubmit: this.handleSubmit}, 
+				React.createElement("h2", null, Text.home.reset, " ", React.createElement(SnowpiMan, null)), 
+				showflashmessage, 
+					
+					React.createElement("div", {className: this.state.username === '' ? 'input-group has-error':'input-group'}, 
+						
+						React.createElement("span", {className: "input-group-addon"}, " ", Text.home.resetemail), 
+						React.createElement("input", {type: "text", ref: "resetemail", className: "form-control", valueLink: this.linkState('resetemail'), id: "Snowpi-resetemail"})
+				
+					), 
+					
+					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+					
+					React.createElement("div", {className: "col-xs-6 "}, React.createElement(BootstrapButton, {role: "button", onClick: this.resetemail, ref: "resetbutton", bsStyle: "info", disabled: (this.state.email === '' ) ? true : false, "data-loading-text": "Checking..."}, "  ", Text.home.btns.resetpass, " ")), 
+					
+					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {onClick: this.changeReset, bsStyle: "default"}, "  ", Text.home.btns.logincurrent, " ")), 
+					React.createElement("div", {className: "clearfix"})
+			));
+		
+		var securityQuestions = Text.registerSecurityQuestions.map(function(val) {
+			var options = val.questions.map(function(op, key) {
+				return (
+					React.createElement("option", {key: key, value: op}, op)
+				);
+			});
+			return (
+				React.createElement("div", {className: "input-group", key: val.name}, 
+					React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: val.label || ''}}), 
+					React.createElement("select", {ref: val.field + '_select', className: "form-control"}, 
+						options
+					), 
+					React.createElement("input", {type: "text", ref: val.field, placeholder: val.placeholder || Text.home.securityPlaceholder, className: "form-control", valueLink: this.linkState(val.field)})
+				)
+			);
+		}.bind(this));
+		if(securityQuestions.length === 0) {
+			var questions = '';
+		} else {
+			var questions = (
+				React.createElement("div", null, 
+				React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+				React.createElement("div", {className: "form-group"}, 
+					   
+					React.createElement("div", {className: "col-sm-12"}, 
+						React.createElement("p", {className: "form-control-static"}, Text.home.securityHeader)
+					)
+				), 
+				React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
+				securityQuestions
+				)
+			);
+		}
 		var register =(React.createElement("form", {ref: "signin", className: "signin-form", onSubmit: this.handleSubmit}, 
 				React.createElement("h2", null, Text.home.register, " ", React.createElement(SnowpiMan, null)), 
 				showflashmessage, 
@@ -207,7 +276,7 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 					
 					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
 					React.createElement("div", {className: (this.state.confirm === '' || this.state.password === '' || this.state.confirm !== this.state.password ) ? 'input-group has-error':'input-group'}, 
-						React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.confirm}}), 
+						React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.confirm || ''}}), 
 						React.createElement("input", {type: "password", ref: "confirm", className: "form-control", valueLink: this.linkState('confirm'), id: "Snowpi-confirm"})
 						
 					), 
@@ -229,10 +298,12 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 					), 
 					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
 					React.createElement("div", {className: "input-group"}, 
-						React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.email}}), 
+						React.createElement("span", {className: "input-group-addon", dangerouslySetInnerHTML: {__html: Text.home.email || ''}}), 
 						React.createElement("input", {type: "email", ref: "email", className: "form-control", defaultValue: "", id: "Snowpi-email"})
 						
 					), 
+					
+					questions, 
 					
 					React.createElement("div", {className: "clearfix"}, React.createElement("br", null)), 
 					
@@ -240,9 +311,9 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 					
 					React.createElement("div", {className: "col-xs-6 ", style: {textAlign:'right'}}, React.createElement(BootstrapButton, {role: "button", onClick: this.showregister, className: "btn btn-default"}, "  ", Text.home.btns.logincurrent, " ")), 
 					React.createElement("div", {className: "clearfix"})
-			));	   
+			));
 		
-		return ( React.createElement("div", {className: loginORregister + " centerme col-xs-12 shakeme " + haserror}, this.state.register===no?login:register, " "));
+		return ( React.createElement("div", {className: loginORregister + " centerme col-xs-12 shakeme " + haserror}, this.state.resetform===yes ? reset : this.state.register===no ? login : register, " "));
 	},
 	componentDidMount: function() {
 		// When the component is added let me know
@@ -255,12 +326,54 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 		this.setState({register: this.state.register===yes?no:yes,response:no})
 		return false;
 	},
-	handleSubmit: function() {
-		/* like preventDefault()
-		 * this is attached to the form element with onSubmit={this.handleSubmit}
-		 * our login / register buttons submit
+	changeReset: function (e) {
+		/* toggle the password reset
 		 * */
-		return false;
+		this.setState({resetform: this.state.resetform===yes?no:yes,response:no})
+		return e.preventDefault();
+	},
+	handleSubmit: function(e) {
+		return e.preventDefault();
+	},
+	resetemail: function() {
+		/* validation occurs as input is received 
+		 * this method should only be avialable if
+		 * all validation is already met so just run
+		 * */
+		var mydata = {reset:'yes'};
+		this.setState({response:no});
+		mydata.email = this.refs.resetemail.getDOMNode().value.trim()
+		mydata[isKey] = isMe;
+		var btn = $(this.refs.resetbutton.getDOMNode())
+		btn.button('loading')
+		$.ajax({
+			url: '/greeter-reset-password',
+			dataType: 'json',
+			method: 'post',
+			data: mydata,
+			success: function(data) {
+							
+				function message() {
+					data.message = 'Success';
+				}
+				/* flash messages are shown with response : yes
+				 * */	
+				this.setState({response:yes,data:data,resetform:no});
+				
+			}.bind(this),
+			
+			error: function(xhr, status, err) {
+				console.log(this.props.url, status, err.toString());
+				this.setState({response:yes,resetform:no,data: {status:status,err:err.toString()} });
+			}.bind(this)
+		
+		/* always reset our buttons
+		* */	
+		}).always(function () {
+			
+			btn.button('reset');
+		});
+		
 	},
 	register: function() {
 		/* validation occurs as input is received 
@@ -275,6 +388,10 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 		mydata.email = this.refs.email.getDOMNode().value.trim()
 		mydata.name = this.refs.name.getDOMNode().value.trim()
 		mydata[isKey] = isMe;
+		Text.registerSecurityQuestions.forEach(function(val) {
+			mydata[val.field] = this.refs[val.field].getDOMNode().value.trim();
+			mydata[val.field + '_select'] = this.refs[val.field + '_select'].getDOMNode().value.trim()
+		}.bind(this));
 		var btn = $(this.refs.registerbutton.getDOMNode())
 		btn.button('loading')
 		$.ajax({
@@ -334,7 +451,7 @@ var SnowpiLogin = React.createClass({displayName: "SnowpiLogin",
 				this.setState({response:yes,data: {status:status,err:err.toString()} });
 			}.bind(this)
 		
-		/* neat little trick to always reset our buttons
+		/*  always reset our buttons
 		* */	
 		}).always(function () {
 			
