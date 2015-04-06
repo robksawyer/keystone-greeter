@@ -31,9 +31,7 @@ html
 		#snowpi
 	
 		//- JAVASCRIPT
-		script(src='/snowpi/js/lib/jquery/jquery-2.1.1.min.js')
-		script(src='/snowpi/js/lib/bootstrap/bootstrap-3.2.0.min.js')
-		script(src='/snowpi/js/lib/bower_components/react/react-with-addons.js')
-		script(src='/snowpi/js/lib/bower_components/react-bootstrap/react-bootstrap.min.js')
-		script(src='/greeter_keystone.js')
-		script(src='/snowpi/js/lib/react/build/greeter.js')
+		script(src='/snowpi/js/vendor.js')
+		script.
+			var isMe = '#{csrf_token_value}';var isKey = '#{csrf_token_key}';var Text = !{JSON.stringify(text)}
+		script(src='/snowpi/js/client.js')

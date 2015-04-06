@@ -8,9 +8,16 @@ var keystone = require('keystone'),
 	sanitizer=require('sanitizer'),
 	config = require('./lib/config.js'),
 	debug = require('debug')('greeter'),
+	i18n = require("i18n"),
+	Text = i18n.__,
 	yes = 'yes', /* true === 'yes' - isTrue === true;  >> will fail; use isTrue === yes*/
 	no = 'no' /* false === 'no'  - isTrue === no;  >> for truely false */;
 
+i18n.configure({
+	locales:['en'],
+	directory: __dirname + '/locales'
+});
+	
 var templateCache = {};
 /**
  * grabs the true app root
@@ -22,106 +29,253 @@ var appRoot = (function(_rootPath) {
 })(module.parent ? module.parent.paths[0] : module.paths[0]);
 
 
-var SnowpiGreeter = function() {
+var SnowGreeter = function() {
 	
 	this._options = {}
 	/* set the module variables
 	 * */	
-	this._defaults();
-}
-
-SnowpiGreeter.prototype._defaults = function() {
-		
 	this.set('user model',keystone.get('user model') || 'User');
+	
+	this.set('defaults', true);
 	
 	this.set('allow register',true);
 	this.set('new user can admin',false);
+	this.set('2FA',false);
+	this.set('social',false);
+	this.set('register security',true);
 	
-	this.set('greeter',keystone.get('signin url') || '/greeter');
+	this.set('route greeter',keystone.get('signin url') || '/greeter');
+	this.set('route relay', '/greeter-keystone-relay');
+	this.set('route reset', '/greeter-reset-password');
+	
 	this.set('redirect timer',0);
 	
 	this.set('greeter style',true);
 	this.set('keystone style',true);
 	
-	this.setField('field username', 'email');
-	this.setField('field password', 'password');
-	this.setField('field name', ['name','first','last']);
-	this.setField('field email', false);
-	this.setField('field security', {
-		'placeholder': 'answer',
-		'label': 'Answer the following questions for password reset options.'
-	});
-	this.setField('field info', {
-		'label': 'A name and email are optional.  Supplying an email is the only way to reset a lost password'
+	this.resetField('all');
+	
+	this.setButton({
+		login: Text('login'),
+		logincurrent: Text('current user?'),
+		register: Text('register new account'),
+		reset: Text('reset your password'),
+		resetpass: Text('send reset email'),
 	});
 	
-	this.setField('field reset questions', [
-		{
+	this.setMessage('register header', Text('register new account'));
+	this.setMessage('login header', Text('welcome back'));
+	this.setMessage('reset header', Text('reset your password'));
+	this.setMessage('valid credentials', Text('a valid username and password are required'));
+	this.setMessage('welcome', Text('Welcome back %s','{user}.'));
+	this.setMessage('welcome login', Text('Welcome back.  Please signin'));
+	this.setMessage('registration closed', Text('registration is currently closed'));
+	this.setMessage('current user', Text('You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? '));
+	this.setMessage('bad token', Text('bad request token. %s',' <a href="javascript:location.reload()">refresh</a>'));
+	this.setMessage('username taken', Text('the username requested is not available'));
+	this.setMessage('failed register', Text('there was a problem creating your new account.'));
+	this.setMessage('register all fields', Text('please fill in username, password and password again...'));
+	this.setMessage('reset email sent', Text('check your email.  reset instructions have been sent.'));	
+	
+}
+
+SnowGreeter.prototype.init = function(options,statics) {
+	
+	this.options(options,function() {
+		if(this.get('defaults')) {
+			this.defaults();
+		}
+	}.bind(this));
+	
+	if(!statics)this.statics();
+	
+	return this;
+	
+}
+
+SnowGreeter.prototype.defaults = function() {
+	
+	this.setField('login', 'text', 'A-username', {
+		label: Text('email'),
+		field: 'email',
+		regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		model: {
+			field: 'email',
+			unique: false
+		},
+		required: true
+	});
+	this.setField('login', 'password', 'B-password', {
+		label: Text('password'),
+		field: 'password',
+		regex: ["^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$", "g"],
+		required: true
+	});
+	
+	this.setField('reset', 'text', 'A-email', {
+		label: Text('email'),
+		field: 'email',
+		regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		required: true
+	});
+	this.setField('resetcode', 'text', 'A-code', {
+		label: Text('code from email'),
+		field: 'resetcode',
+		required: true
+	});
+	this.setField('register', 'text', 'A-username', {
+		label: Text('email'),
+		field: 'email',
+		regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		required: true,
+		model: {
+			field: 'email',
+			unique: true
+		},
+	});
+	this.setField('register', 'password', 'B-password', {
+		label: Text('password'),
+		field: 'password',
+		required: true,
+		regex: ["^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$", "g"],
+		attach: {
+			label: 'confirm',
+			field: 'confirm',
+			required: true,
+			dependsOn: 'B-password'
+		} 
+	});
+	this.setField('register', 'header', 'C-info', {
+		'label': Text('Full Name')
+	});
+	this.setField('register', 'text','D-name', {
+		label: Text('name'),
+		'field': 'name',
+		modify: ['first','last'],
+		modifyParameter: ' ',
+		placeholder: 'first last'
+	});
+	
+	if(this.get('register security')) {
+		this.setField('register', 'header', 'F-header', {
+			'label': Text('Answer the following questions for password reset options.')
+		});
+		this.setField('register', 'select', 'F1-security', {
 			field: 'q1',
-			answer: 'q1Answer',
-			label: 'Question 1',
-			placeholder: 'answer',
-			questions: [
+			label: Text('Question 1'),
+			options: [
+				'Select a question',
 				'Mothers maiden name',
 				'Fathers middle name',
 				'Hospital you were born in',
 				'House number you grew up in'
-			]
-		},
-		{
+			],
+			required: true,
+			attach: {
+				type: 'text',
+				field: 'q1Answer',
+				required: true,
+				placeholder: Text('answer'),
+				dependsOn: 'F1-security'
+			}
+		});
+		this.setField('register', 'select', 'F2-security', {
 			field: 'q2',
-			answer: 'q2Answer',
-			label: 'Question 2',
-			placeholder: 'answer question 2',
-			questions: [
+			label: Text('Question 2'),
+			options: [
+				'select a question',
 				'Favorite Color',
 				'Favorite Dog Breed',
 				'Do you cat?',
 				'Your first phone number'
-			]
-		}
-	]);
-	
-	this.set('message valid credentials', 'a valid username and password are required');
-	this.set('message welcome', 'Welcome back {user}. ');
-	this.set('message welcome login', 'Welcome back.  Please signin');
-	this.set('message registration closed', 'registration is currently closed');
-	this.set('message current user', 'You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? ');
-	this.set('message bad token', 'bad request token.  <a href="javascript:location.reload()">refresh</a>');
-	this.set('message username taken', 'the username requested is not available');
-	this.set('message failed register', 'there was a problem creating your new account.');
-	this.set('message register all fields', 'please fill in username, password and password again...');
-	this.set('message reset email sent', 'check your email.  reset instructions have been sent.');
+			],
+			required: true,
+			attach: {
+				type: 'text',
+				field: 'q2Answer',
+				placeholder: Text('answer question 2'),
+				required: true,
+				dependsOn: 'F2-security'
+			}
+		});
+	}
 	
 	this._emailDefaults();
 }
 
-SnowpiGreeter.prototype.setField = function(field,options) {
-	if(_.isString(options)) {
+SnowGreeter.prototype.resetField = function(field) {
+	if(field === 'all') {
+		this.set('form login',{});
+		this.set('form register',{});
+		this.set('form reset',{});
+		this.set('form resetcode',{});
+		this.set('form code',{});
+		this.set('form buttons',{});
+	} else if(field) {
+		this.set('form ' + field, {});
+	}
+}
+
+SnowGreeter.prototype.setField = function(form,type,name,options) {
+	if (!_.isString(form) || !_.isString(type) || !_.isString(name)) {
+		return false;
+	} 
+	if (_.isString(options) || !options) {
+		if(!options)options = name;
 		options = {
 			'label': options,
 			'field': options,
+			'type': type,
 		}
+	} else {
+		if(!options.label) {
+			return false;
+		}
+		if(!options.field) options.field = options.label;
+		options.type = type;
+		options.form = form;
+	}
+	options._name = name;
+	
+	if(_.isObject(this.get('form ' + form))) {
+		var current = this.get('form ' + form);
+		current[name] = options;
+		this.set('form ' + form, current);
 	}
 	
-	this.set(field,options);
-	
+}
+SnowGreeter.prototype.setMessage = function(field,message) {
+	if(_.isString(message)) {
+		this.set('message ' + field,message);
+	}
+}
+SnowGreeter.prototype.setButton = function(button,text) {
+	if(_.isObject(button)) {
+		_.each(button,function(v,k) {
+			this.setButton(k, v);
+		},this);
+	} else if(_.isString(button) && _.isString(text)) {
+		var current = this.get('form buttons');
+		current[button] = Text(text);
+		this.set('form buttons', current);
+	}
 }
 
-SnowpiGreeter.prototype._emailDefaults = function() {
+SnowGreeter.prototype._emailDefaults = function() {
 	
 	this.set('emails from name', keystone.get('name'));
 	this.set('emails from email', 'info@inquisive.com');
-	this.set('emails reset subject', 'Reset password request from ' + keystone.get('name'));
+	this.set('emails reset subject', Text('Reset password request from %s', keystone.get('name')));
 	this.set('emails template', '<div>A request has been made to reset your password on ' + keystone.get('name') + '.</div> <div> If this is an error ignore this email.</div><div><br /><a href="{link}">Visit this link to reset your password.</a></div>');
 }
 
-SnowpiGreeter.prototype._statics = function() {
+SnowGreeter.prototype._statics = function() {
 	var app = keystone.app;
 	app.use( express.static(__dirname + "/public"));
 }
 
-SnowpiGreeter.prototype.statics = function() {
+
+SnowGreeter.prototype.statics = function() {
 	var static = keystone.get('static');
 	if (!_.isArray(static)) {
 		static = [static]
@@ -131,19 +285,11 @@ SnowpiGreeter.prototype.statics = function() {
 	this._public = true;
 }
 
-SnowpiGreeter.prototype.resetQuestion = function(options) {
-	if(_.isObject(options) && options.name && _.isArray(options.questions)) {
-		this._options['field reset questions'].push(options);
-		debug('set field reset questions');
-		debug(this._options['field reset questions']);
-	}
-}
-
-SnowpiGreeter.prototype.add = function(setview) {
+SnowGreeter.prototype.add = function(setview) {
 	/* add the greeter page
 	 * */
 	var app = keystone.app,
-		view = setview && setview !== undefined ? setview: this.get('greeter') || '/greeter',
+		view = setview && setview !== undefined ? setview: this.get('route greeter'),
 		snowpi = this,
 		userModel = this.get('user model');
 	
@@ -209,13 +355,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 			var locals = {
 				env: keystone.get('env'),
 				brand: keystone.get('name'),
-				emailText: snowpi.get('field email').label,
-				usernameText: snowpi.get('field username').label,
-				passwordText: snowpi.get('field password').label,
-				confirmText: snowpi.get('field confirm').label,
 				logoman: snowpi.get('logoman'),
-				nameText: snowpi.get('field name').label,
-				infoText: snowpi.get('field info').label,
 				greeterStyle: snowpi.get('greeter style'),
 				keystoneStyle: snowpi.get('keystone style'),
 				customStyle: snowpi.get('custom style'),
@@ -225,7 +365,8 @@ SnowpiGreeter.prototype.add = function(setview) {
 				title: keystone.get('brand'),
 				csrf_token_key: keystone.security.csrf.TOKEN_KEY,
 				csrf_token_value: keystone.security.csrf.getToken(req, res),
-				csrf_query: '&' + keystone.security.csrf.TOKEN_KEY + '=' + keystone.security.csrf.getToken(req, res),
+				//csrf_query: '&' + keystone.security.csrf.TOKEN_KEY + '=' + keystone.security.csrf.getToken(req, res),
+				text: JSON.stringify(snowpi._locals(req, res))
 			};
 	
 			// Render the view
@@ -238,7 +379,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 	
 	/* add the api controller
 	 * */
-	app.post('/greeter-reset-password',
+	app.post(snowpi.get('route reset'),
 		publicAPI, //middleware to add api response
 		function(req,res) {
 			
@@ -285,7 +426,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 		
 		}
 	);
-	app.post('/greeter-keystone-relay', 
+	app.post(snowpi.get('route relay'), 
 		publicAPI, //middleware to add api response
 		function(req, res) {
 			if (req.user) {
@@ -308,21 +449,21 @@ SnowpiGreeter.prototype.add = function(setview) {
 				/* we expect "yes"===true and "no"===false */
 				if(req.body.login === yes) { 
 					
-					if (!req.body.username || !req.body.password) {
+					if (!req.body.email || !req.body.password) {
 						
 						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:snowpi.get('message valid credentials'),code:401,data:{}});
 					}
 					
 					var onSuccess = function(user) {			
 						
-						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message welcome').replace('{user}',req.body.username),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
+						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message welcome').replace('{user}',req.body.email),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 					}
 					
 					var onFail = function() {
 						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:snowpi.get('message valid credentials'),code:401,data:{}});
 					}
 					
-					keystone.session.signin({ email: req.body.username, password: req.body.password }, req, res, onSuccess, onFail);
+					keystone.session.signin({ email: req.body.email, password: req.body.password }, req, res, onSuccess, onFail);
 					
 				} else if(req.body.register === yes) { 
 					if(snowpi.get('debug'))console.log('allow register',snowpi.get('allow register'))
@@ -332,7 +473,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							
 							function(cb) {
 								
-								if (!req.body.password || !req.body.confirm || !req.body.username) {
+								if (!req.body.password || !req.body.confirm || !req.body.email) {
 									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message register all fields'),code:401,data:{}});
 								}
 								
@@ -346,7 +487,7 @@ SnowpiGreeter.prototype.add = function(setview) {
 							
 							function(cb) {
 								if(snowpi.get('debug'))console.log('check user');
-								keystone.list(userModel).model.findOne({ email: req.body.username }, function(err, user) {
+								keystone.list(userModel).model.findOne({ email: req.body.email }, function(err, user) {
 									
 									if (err || user) {
 										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message username taken'),code:401,data:{}});
@@ -474,49 +615,31 @@ SnowpiGreeter.prototype.add = function(setview) {
 		}
 	); //end app.post
 	
-	app.get('/greeter_keystone.js',
-		function(req, res) {
-			
-			config.registerSecurityQuestions = !snowpi.get('field security') ? false : _.isArray(snowpi.get('field reset questions')) ? snowpi.get('field reset questions') : false;
-			var root = {
-				name: keystone.get('name'),
-				logoman: snowpi.get('logoman'),
-				host: req.get('host'),
-				signout: keystone.get('signout url'),
-				brand: keystone.get('brand'),
-				csrf_token_key: keystone.security.csrf.TOKEN_KEY,
-				csrf_token_value: keystone.security.csrf.getToken(req, res),
-				csrf_query: '&' + keystone.security.csrf.TOKEN_KEY + '=' + keystone.security.csrf.getToken(req, res),
-			};
-			root.home = {
-				email: snowpi.get('field email'),
-				username: snowpi.get('field username'),
-				password: snowpi.get('field password'),
-				confirm: snowpi.get('field confirm'),
-				name: snowpi.get('field name'),
-				emailnotice: snowpi.get('field info'),
-				securityHeader: snowpi.get('field security').label,
-				securityPlaceholder: snowpi.get('field security').placeholder
-			}
-			//debug(config);
-			var cfg = _.merge(config, root);
-			//cfg.home = _.defaults(root.home, config.home);
-			var vars = JSON.stringify(cfg);
-			var send = 'var isMe = "' + root.csrf_token_value + '";var isKey = "' + root.csrf_token_key + '";var Text = ' + vars + ';';
-			var send = send + 'console.log(Text);';
-			res.setHeader('Content-Type', 'text/javascript');
-			debug('send config in /greeter-keystone.js');
-			debug(cfg);
-			res.send(send);
-			//res.write(send);
-			//res.end();
-		}
-	);
+}
+SnowGreeter.prototype._locals = function(req, res) {
+	var root = {
+		name: keystone.get('name'),
+		logoman: this.get('logoman'),
+		host: req.get('host'),
+		relay: this.get('route relay'),
+		resetemail: this.get('route reset'),
+		signout: keystone.get('signout url'),
+		brand: keystone.get('brand'),
+		isKey: keystone.security.csrf.TOKEN_KEY,
+		isMe: keystone.security.csrf.getToken(req, res),
+	};
+	root.login = this.get('form login');
+	root.reset = this.get('form reset');
+	root.register = this.get('form register');
+	root.btns = this.get('form buttons');
+	debug(config);
+	var cfg = _.merge(config, root);
+	
+	return cfg;
 	
 }
 
-
-SnowpiGreeter.prototype.set = function(key,value) {
+SnowGreeter.prototype.set = function(key,value) {
 	
 	if (arguments.length === 1) {
 		return this._options[key];
@@ -533,9 +656,22 @@ SnowpiGreeter.prototype.set = function(key,value) {
 	
 }
 
-SnowpiGreeter.prototype.get = SnowpiGreeter.prototype.set;
+SnowGreeter.prototype.options = function(options,callback) {
+	
+	if(_.isObject(options)) {
+		_.each(options,function(v,k) {
+			this.set(k,v);
+		},this);
+	}
+	if(_.isFunction(callback)) {
+		return callback();
+	}
+	return this._options;
+}
 
-var snowpigreeter = module.exports = exports = new SnowpiGreeter();
+SnowGreeter.prototype.get = SnowGreeter.prototype.set;
+
+var snowgreeter = module.exports = exports = new SnowGreeter();
 /**
  * 2014 snowkeeper
  * github.com/snowkeeper
