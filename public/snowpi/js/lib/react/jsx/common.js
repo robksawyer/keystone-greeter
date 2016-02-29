@@ -78,9 +78,10 @@ module.exports.Form = React.createClass({
 		var _this = this;
 		var form = [];
 		// sort out object of form elements and add them to an array
+		console.log(this.props.inputs);
 		var sorted_list = _(this.props.inputs).keys().sort().map(function (key) {
 			var value = _this.props.inputs[key];
-			form.push(input(key,value,_this.props.context));
+			form.push(container(key, value, _this.props.inputs, _this.props.context));
 		}).value();
 		
 		return form.length === 0 ? (<span />) : (<div>{form}</div>);
@@ -91,7 +92,6 @@ module.exports.FormInputOnChange = function(event, form) {
     // get the current value
     var change = {
 		valid: _.clone(this.state.valid),
-		//form: _.clone(this.state.form)
 	};
 	
 	var valid = false;
@@ -100,19 +100,13 @@ module.exports.FormInputOnChange = function(event, form) {
 	// is this attached
 	if(event.target.dataset.dependson !== 'false') {
 		parent =  form[event.target.dataset.dependson];
-		var input = parent.attach;
-		input.required = parent.required;
+		var input = form[event.target.id];
 		parent.DOM = document.getElementById(parent._name);
 		//console.log(event.target.dataset.dependson);
 	} else {
 		var input = form[event.target.id];
 	}
 	
-	//console.log('onChange',  event.target.id, input, form , event.target.dataset);
-	// set the state value
-	//change.form[input.field] = event.target.value;
-	
-	// if required run tests
 	if(input.required) {	
 		if(_.isArray(input.regex)) {
 			var rx = new RegExp(input.regex[0],input.regex[1]);
@@ -121,16 +115,12 @@ module.exports.FormInputOnChange = function(event, form) {
 			valid = event.target.value !== '';
 		}
 		if(valid && parent && parent.type === 'password') {
-			if(event.target.value === '' || event.target.value !== parent.DOM.value) {
-				valid = false;
-			} else {
+			if(event.target.value !== '' && event.target.value === parent.DOM.value) {
 				valid = true;
 			}
 		}
 		if(valid && parent && parent.type === 'select') {
-			if(event.target.value === '' || parent.DOM.value === '') {
-				valid = false;
-			} else {
+			if(event.target.value !== '' && parent.DOM.value !== '') {
 				valid = true;
 			}
 		}
@@ -159,6 +149,7 @@ function validate_class(input, context) {
 	}
 }
 
+
 function input(name, options, context) {
 	
 	if(!_.isObject(options)) {
@@ -169,66 +160,20 @@ function input(name, options, context) {
 	var dependsOn = options.dependsOn ? options.dependsOn : false;
 	
 	if(type === 'text') {
-		var clas = validate_class(options, context);
-		var div = (
-			<div key={name}>
-			<div className={clas}>		
-				<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: options.label || ''}} /> 
-				<input type="text" id={options._name}  refs={options._name} className="form-control" data-dependson={dependsOn}  onChange={context.onChange}   />
-			</div>
-			<div className="clearfix" ><br /></div>
-			</div>
+		return (
+			<input type="text" id={options._name}  refs={options._name} className="form-control" data-dependson={dependsOn}  onChange={context.onChange}   />
 		);
-		
-		return div;
 		
 	} else if(type === 'password') {
-		/* confirm password if requested */
-		var cfm;
-		if(_.isObject(options.attach) && options.attach.label && options.attach.field) {
-			options.attach.required = options.required;
-			var class2 = validate_class(options.attach, context);
-			var dependsOn = options.attach.dependsOn ? options.attach.dependsOn : false;
-			var cfm = (
-				<div key={name}>
-				<div className={class2}>		
-					<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: options.attach.label || ''}} /> 
-					<input type="password" id={options._name + '_attach'} className="form-control" data-dependson={dependsOn}  data-parent={options._name}  onChange={context.onChange}    />
-				</div>
-				<div className="clearfix" ><br /></div>
-				</div>
-			);
-		}
 		// add password field
-		var clas = validate_class(options, context);
 		var dependsOn = options.dependsOn ? options.dependsOn : false;
-		var div = (
-			<div key={name}>
-			<div className={clas}>
-				<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: options.label || ''}} /> 
-				<input type="password" id={options._name} className="form-control" data-dependson={dependsOn}  onChange={context.onChange}  />
-				
-			</div>
-			<div className="clearfix" ><br /></div>
-			{cfm}
-			</div>
+		return ( 
+			<input type="password" id={options._name} className="form-control" data-dependson={dependsOn}  onChange={context.onChange}  />
 		);
-		
-		return (div);
 		
 	} else if(type === 'select') {
 		
 		var other, opts;
-		// check any validation
-		var clas = validate_class(options, context);
-		
-		// show a text box in the same div for alternate values or question/answer format 
-		if(_.isObject(options.attach)) {
-			options.attach.required = options.required;
-			clas = validate_class(options.attach, context);
-			var dependsOn2 = options.attach.dependsOn ? options.attach.dependsOn : false;
-			other = (<input type="text" id={options._name + '_attach'} placeholder={options.attach.placeholder} className="form-control"   data-parent={options._name} data-dependson={dependsOn2}  onChange={context.onChange}  />);
-		}
 		// build the options list
 		if(_.isArray(options.options)) {
 			opts = options.options.map(function(op) {
@@ -238,27 +183,34 @@ function input(name, options, context) {
 						value:op
 					}
 				}
-				return (
+				return ( 
 					<option key={op.label} value={op.value || op.label}>{op.label}</option>
 				);
 			});
 		}
 		var dependsOn = options.dependsOn ? options.dependsOn : false;
-		var div = (
-			<div  key={name}>
-				<div className={clas}>
-					<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: options.label || ''}} /> 
-					<select id={options._name} className="form-control" data-dependson={dependsOn}  onChange={context.onChange}  >
-						{opts}
-					</select>
-					{other}
-				</div>
-			</div>
+		return (
+			<select id={options._name} className="form-control" data-dependson={dependsOn}  onChange={context.onChange}  >
+				{opts}
+			</select>
 		);
 		
-		return div;
-		
-	} else if(type === 'header') {
+	} 
+	
+}
+
+function container(name, options, inputs, context) {
+	
+	if(!_.isObject(options)) {
+		return false;
+	}
+	if(options.attached) {
+		return false;
+	}
+	
+	var type = options.type;
+	
+	if(type === 'header') {
 		return (
 			<div key={name}>
 				<div className="clearfix" ><br /></div>
@@ -269,7 +221,26 @@ function input(name, options, context) {
 				</div>
 				<div className="clearfix" ><br /></div>
 			</div>
-		);		
+		);	
+		
+	} else {
+		var theinput = input(name, options, context);
+		var attached = false;
+		if(inputs[name + '_attach']) {
+			attached = input(name + '_attach', inputs[name + '_attach'], context);
+		}
+		
+		var clas = validate_class(options, context);
+
+		return (
+			<div key={name}>
+			<div className={clas}>		
+				<span className="input-group-addon"  dangerouslySetInnerHTML={{__html: options.label || ''}} /> 
+				{theinput}
+				{attached}
+			</div>
+			<div className="clearfix" ><br /></div>
+			</div>
+		);
 	}
-	
 }

@@ -1,4 +1,4 @@
-var keystone = require('keystone'),
+var keystone,
 	_ = require('lodash'),
 	express = require('express'),
 	fs = require('fs'),
@@ -34,7 +34,7 @@ var SnowGreeter = function() {
 	this._options = {}
 	/* set the module variables
 	 * */	
-	this.set('user model',keystone.get('user model') || 'User');
+	
 	
 	this.set('defaults', true);
 	
@@ -44,7 +44,7 @@ var SnowGreeter = function() {
 	this.set('social',false);
 	this.set('register security',true);
 	
-	this.set('route greeter',keystone.get('signin url') || '/greeter');
+	
 	this.set('route relay', '/greeter-keystone-relay');
 	this.set('route reset', '/greeter-reset-password');
 	
@@ -55,12 +55,16 @@ var SnowGreeter = function() {
 	
 	this.resetField('all');
 	
+	this._formDefaults();
+	
 	this.setButton({
 		login: Text('login'),
 		logincurrent: Text('current user?'),
 		register: Text('register new account'),
 		reset: Text('reset your password'),
-		resetpass: Text('send reset email'),
+		resetpass: Text('reset passwords'),
+		resetemail: Text('send reset email'),
+		resetcode: Text('apply reset code'),
 	});
 	
 	this.setMessage('register header', Text('register new account'));
@@ -81,9 +85,19 @@ var SnowGreeter = function() {
 
 SnowGreeter.prototype.init = function(options,statics) {
 	
-	this.options(options,function() {
+	if(!options.keystone) {
+		console.log('A Keystone instance must be included');
+	}
+	keystone = options.keystone;
+	
+	this.set('user model',keystone.get('user model') || 'User');
+	this.set('route greeter',keystone.get('signin url') || '/greeter');
+	
+	this._emailDefaults();
+	
+	this.options(options, function() {
 		if(this.get('defaults')) {
-			this.defaults();
+			this.formDefaults();
 		}
 	}.bind(this));
 	
@@ -93,7 +107,23 @@ SnowGreeter.prototype.init = function(options,statics) {
 	
 }
 
-SnowGreeter.prototype.defaults = function() {
+/* always include the dufault reset forms.  They can be overwritten */
+SnowGreeter.prototype._formDefaults = function() {
+	this.setField('reset', 'text', 'A-email', {
+		label: Text('email'),
+		field: 'email',
+		regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		required: true
+	});
+	this.setField('resetcode', 'text', 'A-code', {
+		label: Text('code from email'),
+		field: 'resetcode',
+		required: true
+	});
+	
+}
+
+SnowGreeter.prototype.formDefaults = function() {
 	
 	this.setField('login', 'text', 'A-username', {
 		label: Text('email'),
@@ -112,17 +142,6 @@ SnowGreeter.prototype.defaults = function() {
 		required: true
 	});
 	
-	this.setField('reset', 'text', 'A-email', {
-		label: Text('email'),
-		field: 'email',
-		regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
-		required: true
-	});
-	this.setField('resetcode', 'text', 'A-code', {
-		label: Text('code from email'),
-		field: 'resetcode',
-		required: true
-	});
 	this.setField('register', 'text', 'A-username', {
 		label: Text('email'),
 		field: 'email',
@@ -137,20 +156,18 @@ SnowGreeter.prototype.defaults = function() {
 		label: Text('password'),
 		field: 'password',
 		required: true,
-		regex: ["^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$", "g"],
-		attach: {
-			label: 'confirm',
-			field: 'confirm',
-			required: true,
-			dependsOn: 'B-password'
-		} 
+		regex: ["^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$", "g"]
 	});
-	this.setField('register', 'header', 'C-info', {
-		'label': Text('Full Name')
+	this.setField('register', 'password', 'C-confirm', {
+		label: Text('confirm'),
+		field: 'confirm',
+		required: true,
+		dependsOn: 'B-password' 
 	});
+	
 	this.setField('register', 'text','D-name', {
 		label: Text('name'),
-		'field': 'name',
+		'field': 'full name',
 		modify: ['first','last'],
 		modifyParameter: ' ',
 		placeholder: 'first last'
@@ -205,18 +222,25 @@ SnowGreeter.prototype.defaults = function() {
 
 SnowGreeter.prototype.resetField = function(field) {
 	if(field === 'all') {
-		this.set('form login',{});
-		this.set('form register',{});
-		this.set('form reset',{});
-		this.set('form resetcode',{});
-		this.set('form code',{});
-		this.set('form buttons',{});
+		this.set('form login', {});
+		this.set('form register', {});
+		this.set('form reset', {});
+		this.set('form resetcode', {});
+		this.set('form code', {});
+		this.set('form buttons', {});
 	} else if(field) {
 		this.set('form ' + field, {});
 	}
 }
 
-SnowGreeter.prototype.setField = function(form,type,name,options) {
+SnowGreeter.prototype.setField = function(form, type, name, options) {
+	if(_.isArray(form)) {
+		_.each(form, function(v) {
+			this.setField(v.form, v.type, v.name, v.options);
+		}, this);
+		return;
+	}
+	
 	if (!_.isString(form) || !_.isString(type) || !_.isString(name)) {
 		return false;
 	} 
@@ -228,28 +252,44 @@ SnowGreeter.prototype.setField = function(form,type,name,options) {
 			'type': type,
 		}
 	} else {
-		if(!options.label) {
-			return false;
-		}
-		if(!options.field) options.field = options.label;
+		if(!options.label) options.label = options.field || '';
+		if(!options.field) options.field = name;
 		options.type = type;
 		options.form = form;
 	}
 	options._name = name;
-	
 	if(_.isObject(this.get('form ' + form))) {
 		var current = this.get('form ' + form);
 		current[name] = options;
 		this.set('form ' + form, current);
 	}
 	
+	if(_.isObject(options.attach)) {
+		if(!options.attach.field) {
+			if(this.get('debug')) console.log('failed to create attached field');
+			return;
+		}
+		var newField = {
+			field: options.attach.field,
+			label: options.attach.label || false,
+			model: options.attach.model || false,
+			required: options.attach.required || false,
+			regex: options.attach.regex || false,
+			dependsOn: options.attach.dependsOn || name,
+			attached: name,
+			placeholder: options.attach.placeholder || false
+		}
+		this.setField(form, options.attach.type || 'text', name + '_attach', newField);
+			
+	}
+	
 }
-SnowGreeter.prototype.setMessage = function(field,message) {
+SnowGreeter.prototype.setMessage = function(field, message) {
 	if(_.isString(message)) {
 		this.set('message ' + field,message);
 	}
 }
-SnowGreeter.prototype.setButton = function(button,text) {
+SnowGreeter.prototype.setButton = function(button, text) {
 	if(_.isObject(button)) {
 		_.each(button,function(v,k) {
 			this.setButton(k, v);
@@ -282,22 +322,20 @@ SnowGreeter.prototype.statics = function() {
 	}
 	static.push(__dirname + "/public");
 	keystone.set('static',static);
-	this._public = true;
+	this._staticSet = true;
 }
 
 SnowGreeter.prototype.add = function(setview) {
-	/* add the greeter page
+	/* add the greeter routes
 	 * */
 	var app = keystone.app,
 		view = setview && setview !== undefined ? setview: this.get('route greeter'),
 		snowpi = this,
 		userModel = this.get('user model');
 	
-	this._emailDefaults();
-	
 	/* add our static files as an additional directory
 	 * */
-	if(!this._public) snowpi._statics();
+	if(!this._staticSet) snowpi._statics();
 	
 	/* middleware to add snowpiResponse
 	 * */
@@ -630,6 +668,8 @@ SnowGreeter.prototype._locals = function(req, res) {
 	};
 	root.login = this.get('form login');
 	root.reset = this.get('form reset');
+	root.resetcode = this.get('form resetcode');
+	root.resetpass = this.get('form resetpass');
 	root.register = this.get('form register');
 	root.btns = this.get('form buttons');
 	debug(config);

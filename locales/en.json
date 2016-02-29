@@ -25,5 +25,8 @@
 	"answer": "answer",
 	"Question 2": "Question 2",
 	"answer question 2": "answer question 2",
-	"Reset password request from %s": "Reset password request from %s"
+	"Reset password request from %s": "Reset password request from %s",
+	"reset passwords": "reset passwords",
+	"apply reset code": "apply reset code",
+	"confirm": "confirm"
 }

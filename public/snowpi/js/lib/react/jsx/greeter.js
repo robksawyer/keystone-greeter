@@ -3,6 +3,7 @@ var ReactBootstrap = require('react-bootstrap');
 var Login = require('./forms/login');
 var Reg = require('./forms/reg');
 var ResetPassword = require('./forms/reset');
+var ResetCode = require('./forms/code');
 var GFlash = require('./flash');
 var Common = require('./common.js');
 var GInterval = Common.GInterval;
@@ -67,7 +68,9 @@ var GLogin = React.createClass({
 			
 		}
 		
-		if(this.state.resetform === yes) {
+		if(this.state.resetcode === yes) {
+			var ret = <ResetCode  context={this} changeReset={this.changeCode} flash={showflashmessage} />
+		} else if(this.state.resetform === yes) {
 			var ret = <ResetPassword  context={this} changeReset={this.changeReset} flash={showflashmessage} />
 		} else if(this.state.register === no) {
 			var ret = <Login  context={this} showregister={this.showregister} changeReset={this.changeReset} flash={showflashmessage} />
@@ -84,13 +87,19 @@ var GLogin = React.createClass({
 	showregister: function (e) {
 		/* toggle the register / login forms
 		 * */
-		this.setState({register: this.state.register===yes?no:yes,response:no})
+		this.setState({register: this.state.register === yes ? no : yes,response:no})
 		return e.preventDefault();
 	},
 	changeReset: function (e) {
 		/* toggle the password reset
 		 * */
-		this.setState({resetform: this.state.resetform===yes?no:yes,response:no})
+		this.setState({resetform: this.state.resetform === yes ?no : yes,response:no})
+		return e.preventDefault();
+	},
+	changeCode: function (e) {
+		/* toggle the password reset
+		 * */
+		this.setState({resetcode: this.state.resetcode === yes ?no : yes,response:no})
 		return e.preventDefault();
 	},
 	handleSubmit: function(e) {

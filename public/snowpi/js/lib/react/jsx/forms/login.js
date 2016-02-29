@@ -2,6 +2,7 @@ var React = require('react');
 var Text = JSON.parse(require('text'));
 var Common = require('../common.js');
 var GInterval = Common.GInterval;
+var GFlash = require('../flash');
 var _ = require('lodash');
 var ReactBootstrap = require('react-bootstrap');
 var BootstrapButton = ReactBootstrap.Button;
@@ -28,7 +29,21 @@ var Login = React.createClass({
 		Common.FormInputOnChange.call(this, e, Text.login);
 	},
 	render: function() {
-						
+		/* if response state is yes we have a flash message to show
+		 * the message is in data
+		 * */
+		if(this.state.response === yes) {
+			
+			var pickclass = (this.state.data.success === yes ) ? 'success' : 'warning'; 
+			
+			showflashmessage = <GFlash showclass={pickclass} cleartimeouts={[GInterval.timeout]} clearintervals={[GInterval.redirect]}><div dangerouslySetInnerHTML={{__html: this.state.data.message || ''}} /></GFlash >;
+			
+			/* if we have an error shake the form.  this is done with the
+			 * has-errors class
+			 * */
+			if(this.state.data.success === no) haserror = ' has-errors';
+			
+		}			
 			return (<form  ref='signin'  className="signin-form"  onSubmit={this.handleSubmit} >
 				<h2>{Text.home.login} <Common.GMan /></h2>
 				{this.props.flash}
@@ -94,7 +109,7 @@ var Login = React.createClass({
 					window.location.href = data.redirect.path;
 				}
 				
-				this.props.context.setState({response:yes,data:data});
+				this.setState({response:yes,data:data});
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.log(err, status, err.toString());
