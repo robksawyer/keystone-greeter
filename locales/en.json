@@ -12,6 +12,7 @@
 	"You are currently signed in.  Do you want to <a href=\"/keystone/signout\">sign out</a>? ": "You are currently signed in.  Do you want to <a href=\"/keystone/signout\">sign out</a>? ",
 	"bad request token. %s": "bad request token. %s",
 	"the username requested is not available": "the username requested is not available",
+	"Your passwords do not match": "Your passwords do not match",
 	"there was a problem creating your new account.": "there was a problem creating your new account.",
 	"please fill in username, password and password again...": "please fill in username, password and password again...",
 	"check your email.  reset instructions have been sent.": "check your email.  reset instructions have been sent.",

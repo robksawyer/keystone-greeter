@@ -58,7 +58,7 @@ var Login = React.createClass({
 					
 					<div className="clearfix" ><br /></div>
 					
-					<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton role="button" onClick={this.props.changeReset}  bsStyle='default' >  {Text.btns.reset} </BootstrapButton></div> 
+					<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right', paddingTop:10}} ><BootstrapButton role="button" onClick={this.props.changeReset}  bsStyle='default' >  {Text.btns.reset} </BootstrapButton></div> 
 					
 					<div className="clearfix" ></div>
 			</form>);
@@ -88,9 +88,9 @@ var Login = React.createClass({
 					var secs = (data.redirect.when - rrr) / 1000;
 					rrr+=1000;
 					data.message = data.repeater + '<br />You will be redirected to <a href="' + data.redirect.path + '">' + data.redirect.path.substr(1) + '</a>  ';
-					data.message+= secs === 0 ? ' now':' in ' + secs + ' seconds.';
+					data.message += secs === 0 ? ' now':' in ' + secs + ' seconds.';
 				}
-				if(typeof data.redirect === 'object' && data.redirect.when>1000) {
+				if(typeof data.redirect === 'object' && data.redirect.when > 1000) {
 					data.repeater = data.message;
 					var rrr = 1000
 						_self = this.props.context;
@@ -109,11 +109,20 @@ var Login = React.createClass({
 					window.location.href = data.redirect.path;
 				}
 				
-				this.setState({response:yes,data:data});
+				this.props.context.setState({
+					response: yes,
+					data: data
+				});
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.log(err, status, err.toString());
-				this.props.context.setState({response:yes,data: {status:status,err:err.toString()} });
+				this.props.context.setState({
+					response:yes,
+					data: {
+						status:status,
+						err:err.toString()
+					} 
+				});
 			}.bind(this)
 		});		
 	}

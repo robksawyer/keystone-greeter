@@ -60,12 +60,12 @@ module.exports.setFormState = function(inputs, valid) {
 	ret.form = {};
 	_.each(inputs, function(v) {
 		if(v.type !== 'header') ret.form[v.field] = v._name;
-		if(v.required) {
+		if(v.required && !ret.valid[v.field]) {
 			ret.valid[v.field] = false;
 		}
 		if(v.attach) {
 			ret.form[v.attach.field] = v._name + '_attach';
-			if(v.required) {
+			if(v.required && !ret.valid[v.attach.field]) {
 				ret.valid[v.attach.field] = false;
 			}
 		}
@@ -124,11 +124,9 @@ module.exports.FormInputOnChange = function(event, form) {
 				valid = true;
 			}
 		}
-		if(valid) {
-			change.valid[input.field] = true;
-		} else {
-			change.valid[input.field] = false;
-		}
+		
+		change.valid[input.field] = valid;
+		
 	}
 	
 	//console.log('change', valid, change);

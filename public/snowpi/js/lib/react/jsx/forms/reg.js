@@ -48,7 +48,7 @@ var RR = React.createClass({
 		 * all validation is already met so just run
 		 * */
 		console.log('form', this.state.form, 'Text', Text.register ); 
-		var mydata = {register:'yes'};
+		var mydata = { register: 'yes' };
 		_.each(this.state.form, function(v,k) {
 			if(v.type !== 'header') {
 				var el = document.getElementById(v);
@@ -87,7 +87,10 @@ var RR = React.createClass({
 						 * just recaculate the message and let react do the rest
 						 * */
 						message();
-						_self.setState({response:yes,data:data});
+						_self.setState({
+							response: yes,
+							data: data
+						});
 					},1000);
 					
 					/* kill the interval and redirect on the timeout 
@@ -107,13 +110,22 @@ var RR = React.createClass({
 				
 				/* flash messages are shown with response : yes
 				 * */	
-				this.props.context.setState({response:yes,data:data});
+				this.props.context.setState({
+					response: yes,
+					data: data
+				});
 				
 			}.bind(this),
 			
 			error: function(xhr, status, err) {
 				console.log(this.props.url, status, err.toString());
-				this.props.context.setState({response:yes,data: {status:status,err:err.toString()} });
+				this.props.context.setState({
+					response:yes,
+					data: {
+						status:status,
+						err:err.toString()
+					}
+				});
 			}.bind(this)
 		
 		/* neat little trick to always reset our buttons

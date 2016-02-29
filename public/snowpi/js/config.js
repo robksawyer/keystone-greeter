@@ -27,7 +27,8 @@ var Text = {
 			resetpass: 'send reset email',
 		}
 	},//end main
-	logoman: '<div class="logoman"><div class="dotdot flip">.</div><div>i</div><div class="dotdot flip">.</div></div>',
+	logoman: '<span></span>'
+	//logoman: '<div class="logoman"><div class="dotdot flip">.</div><div>i</div><div class="dotdot flip">.</div></div>',
 };
 
 

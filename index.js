@@ -1,17 +1,18 @@
-var keystone,
-	_ = require('lodash'),
-	express = require('express'),
-	fs = require('fs'),
-	path = require('path'),
-	async = require('async'),
-	jade = require('jade'),
-	sanitizer=require('sanitizer'),
-	config = require('./lib/config.js'),
-	debug = require('debug')('greeter'),
-	i18n = require("i18n"),
-	Text = i18n.__,
-	yes = 'yes', /* true === 'yes' - isTrue === true;  >> will fail; use isTrue === yes*/
-	no = 'no' /* false === 'no'  - isTrue === no;  >> for truely false */;
+var keystone;
+var _ = require('lodash');
+var express = require('express');
+var fs = require('fs');
+var path = require('path');
+var async = require('async');
+var jade = require('jade');
+var sanitizer=require('sanitizer');
+var config = require('./lib/config.js');
+var debug = require('debug')('greeter');
+var i18n = require("i18n");
+var Text = i18n.__;
+
+var yes = 'yes'; /* true === 'yes' - isTrue === true;  >> will fail; use isTrue === yes*/
+var no = 'no' /* false === 'no'  - isTrue === no;  >> for truely false */;
 
 i18n.configure({
 	locales:['en'],
@@ -38,20 +39,20 @@ var SnowGreeter = function() {
 	
 	this.set('defaults', true);
 	
-	this.set('allow register',true);
-	this.set('new user can admin',false);
-	this.set('2FA',false);
-	this.set('social',false);
-	this.set('register security',true);
+	this.set('allow register', true);
+	this.set('new user can admin', false);
+	this.set('2FA', false);
+	this.set('social', false);
+	this.set('register security', false);
 	
 	
 	this.set('route relay', '/greeter-keystone-relay');
 	this.set('route reset', '/greeter-reset-password');
 	
-	this.set('redirect timer',0);
+	this.set('redirect timer', 0);
 	
-	this.set('greeter style',true);
-	this.set('keystone style',true);
+	this.set('greeter style', true);
+	this.set('keystone style', true);
 	
 	this.resetField('all');
 	
@@ -77,21 +78,23 @@ var SnowGreeter = function() {
 	this.setMessage('current user', Text('You are currently signed in.  Do you want to <a href="/keystone/signout">sign out</a>? '));
 	this.setMessage('bad token', Text('bad request token. %s',' <a href="javascript:location.reload()">refresh</a>'));
 	this.setMessage('username taken', Text('the username requested is not available'));
+	this.setMessage('password match', Text('Your passwords do not match'));
 	this.setMessage('failed register', Text('there was a problem creating your new account.'));
 	this.setMessage('register all fields', Text('please fill in username, password and password again...'));
 	this.setMessage('reset email sent', Text('check your email.  reset instructions have been sent.'));	
 	
 }
 
-SnowGreeter.prototype.init = function(options,statics) {
+SnowGreeter.prototype.init = function(options, statics) {
 	
 	if(!options.keystone) {
 		console.log('A Keystone instance must be included');
+		return false;
 	}
 	keystone = options.keystone;
 	
-	this.set('user model',keystone.get('user model') || 'User');
-	this.set('route greeter',keystone.get('signin url') || '/greeter');
+	this.set('user model', keystone.get('user model') || 'User');
+	this.set('route greeter', keystone.get('signin url') || '/greeter');
 	
 	this._emailDefaults();
 	
@@ -101,7 +104,9 @@ SnowGreeter.prototype.init = function(options,statics) {
 		}
 	}.bind(this));
 	
-	if(!statics)this.statics();
+	if(!statics) {
+		this.statics();
+	}
 	
 	return this;
 	
@@ -321,7 +326,7 @@ SnowGreeter.prototype.statics = function() {
 		static = [static]
 	}
 	static.push(__dirname + "/public");
-	keystone.set('static',static);
+	keystone.set('static', static);
 	this._staticSet = true;
 }
 
@@ -335,7 +340,9 @@ SnowGreeter.prototype.add = function(setview) {
 	
 	/* add our static files as an additional directory
 	 * */
-	if(!this._staticSet) snowpi._statics();
+	if(!this._staticSet) {
+		snowpi._statics();
+	}
 	
 	/* middleware to add snowpiResponse
 	 * */
@@ -473,7 +480,6 @@ SnowGreeter.prototype.add = function(setview) {
 			
 			if (req.method === 'POST') {
 				
-				
 				if (!keystone.security.csrf.validate(req)) {
 					return res.snowpiResponse({action:'greeter',command:'directions',success:'no',message:snowpi.get('message bad token'),code:501,data:{}});
 				}
@@ -546,8 +552,7 @@ SnowGreeter.prototype.add = function(setview) {
 									
 									return cb();
 									
-								});
-								
+								});	
 							},
 							
 							function(cb) {
@@ -556,52 +561,15 @@ SnowGreeter.prototype.add = function(setview) {
 								 * */
 								
 								var userData = {}
-								var name =snowpi.get('field name');
-								if(name) {
-									if(name instanceof Array && name.length > 2) {
-										
-										var splitName = req.body.name.split(' ');
-										
-										userData[name[0]] = {}
-										
-										userData[name[0]][name[1]] = splitName[0];
-										var cname;
-										if(splitName.length >2) {
-											
-											for(var i=1;i<=splitName.length;i++) {
-												cname+=' ' + (splitName[i] || '');
-											}
-											
-										} else {
-											cname = splitName[1] || '';
-										}
-										userData[name[0]][name[2]] =cname;
-									
-									} else if(name instanceof Array && name.length === 2) {
-										
-										userData[name[0]] = {}
-										userData[name[0]][name[1]] = req.body.name;
-										
-									} else if(name instanceof Array){
-										
-										userData[name[0]] = req.body.name;
-										
-									} else {
-										
-										userData[name] = req.body.name;
-										
-									}
-								}
-								if(snowpi.get('field username'))
-									userData[snowpi.get('field username').field] = req.body.username
-								if(snowpi.get('field password'))
-									userData[snowpi.get('field password').field] = req.body.password
-								if(snowpi.get('field email'))
-									userData[snowpi.get('field email').field] = req.body.email
+																						
+								_.each(snowpi.get('form register'), function(v) {
+									userData[v.field] = req.body[v.field];
+								});
+								
 								userData.isAdmin = snowpi.get('new user can admin')
 								
 								// security questions
-								var sq = snowpi.get('field reset questions');
+								var sq = snowpi.get('form reset questions');
 								if(_.isArray(sq) && sq.length > 0) {
 									userData.questions = {};
 									sq.forEach(function (val) {
@@ -610,9 +578,11 @@ SnowGreeter.prototype.add = function(setview) {
 									});
 								}
 								
-								var User = keystone.list(userModel).model,
-									newUser = new User(userData);
-								if(snowpi.get('debug'))console.log('new user set to save',newUser,req.body);
+								var User = keystone.list(userModel).model;
+								var newUser = new User(userData);
+								if(snowpi.get('debug')) {
+									console.log('new user set to save',newUser,userData,req.body);
+								}
 								newUser.save(function(err) {
 									return cb(err);
 								});
@@ -634,7 +604,7 @@ SnowGreeter.prototype.add = function(setview) {
 								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome login'),code:401,data:{}});
 							}
 							
-							keystone.session.signin({ email: req.body.username, password: req.body.password }, req, res, onSuccess, onFail);
+							keystone.session.signin({ email: req.body.email, password: req.body.password }, req, res, onSuccess, onFail);
 							
 						});
 					} else {
@@ -673,6 +643,7 @@ SnowGreeter.prototype._locals = function(req, res) {
 	root.register = this.get('form register');
 	root.btns = this.get('form buttons');
 	debug(config);
+	
 	var cfg = _.merge(config, root);
 	
 	return cfg;

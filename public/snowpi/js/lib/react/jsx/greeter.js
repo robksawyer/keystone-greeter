@@ -38,14 +38,21 @@ var GLogin = React.createClass({
 		 * set response to yes to show a flash message
 		 * error messages are in data
 		 * */
-		return {register: no,mounted: no,response:no,data:{}};
+		return {
+			register: no,
+			mounted: no, 
+			response: no, 
+			data:{}
+		};
 	},
 	componentWillReceiveProps: function() {
 		/* we want to kill the flash anytime the form is rendered
 		 * you can add any other props you need here if you include
 		 * this in another component 
 		 * */
-		this.setState({response:no});
+		this.setState({
+			response:no
+		});
 		return false;
 	},
 	render: function() {
@@ -81,25 +88,36 @@ var GLogin = React.createClass({
 	},
 	componentDidMount: function() {
 		// When the component is added let me know
-		this.setState({mounted: yes})
+		this.setState({
+			mounted: yes
+		});
 		return false;
 	},
 	showregister: function (e) {
 		/* toggle the register / login forms
 		 * */
-		this.setState({register: this.state.register === yes ? no : yes,response:no})
+		this.setState({
+			register: this.state.register === yes ? no : yes,
+			response: no
+		});
 		return e.preventDefault();
 	},
 	changeReset: function (e) {
 		/* toggle the password reset
 		 * */
-		this.setState({resetform: this.state.resetform === yes ?no : yes,response:no})
+		this.setState({
+			resetform: this.state.resetform === yes ? no : yes,
+			response: no
+		});
 		return e.preventDefault();
 	},
 	changeCode: function (e) {
 		/* toggle the password reset
 		 * */
-		this.setState({resetcode: this.state.resetcode === yes ?no : yes,response:no})
+		this.setState({ 
+			resetcode: this.state.resetcode === yes ?no : yes,
+			response:no
+		});
 		return e.preventDefault();
 	},
 	handleSubmit: function(e) {
