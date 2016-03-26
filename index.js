@@ -172,7 +172,7 @@ SnowGreeter.prototype.formDefaults = function() {
 	
 	this.setField('register', 'text','D-name', {
 		label: Text('name'),
-		'field': 'full name',
+		'field': 'name',
 		modify: ['first','last'],
 		modifyParameter: ' ',
 		placeholder: 'first last'
@@ -500,7 +500,7 @@ SnowGreeter.prototype.add = function(setview) {
 					
 					var onSuccess = function(user) {			
 						
-						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message welcome').replace('{user}',req.body.email),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
+						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message welcome').replace('{user}',user['full name']),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 					}
 					
 					var onFail = function() {
@@ -563,8 +563,56 @@ SnowGreeter.prototype.add = function(setview) {
 								var userData = {}
 																						
 								_.each(snowpi.get('form register'), function(v) {
-									userData[v.field] = req.body[v.field];
+									var value = req.body[v.field];
+									if(v.modify) {
+										userData[v.field] = modify(value, v);
+									} else {
+										userData[v.field] = value;
+									}
+									
 								});
+								
+								function modify(value, modify ) {
+									
+									if(!value) return false;
+									if(!modify.modify) return false;
+									
+									var save = {};									
+									var modifiers = modify.modify;
+									var modifyParameter = modify.modifyParameter || ' ';
+									
+									if(modifiers instanceof Array && modifiers.length > 1) {
+										
+										var splitName = value.split(' ');
+																				
+										save[modifiers[0]] = splitName[0];
+										var cname;
+										if(splitName.length > 2) {
+											
+											for(var i=1;i<=splitName.length;i++) {
+												cname+=' ' + (splitName[i] || '');
+											}
+											
+										} else {
+											cname = splitName[1] || '';
+										}
+										save[modifiers[1]] = cname;
+									
+									} else if(modifiers instanceof Array){
+										
+										save[modifiers[0]] = req.body.name;
+										
+									} else if(typeof modifiers === 'string'){
+										
+										save[modifiers] = req.body.name;
+										
+									} else {
+										
+										save = req.body.name;
+										
+									}
+									return save;
+								}
 								
 								userData.isAdmin = snowpi.get('new user can admin')
 								
@@ -597,7 +645,7 @@ SnowGreeter.prototype.add = function(setview) {
 								return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message failed register'),code:401,data:{}});
 							}
 							var onSuccess = function(user) {
-								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome').replace('{user}',user.fullname),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
+								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome').replace('{user}',user['full name']),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
 							}
 							
 							var onFail = function(e) {
