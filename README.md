@@ -40,11 +40,11 @@ keystone.set('routes', function(app) {
 	// change the first login field
 	greeter.setField('login', 'text', 'A-username', {
 		label: 'username',
-		field: 'email',
+		field: 'username',
 		//regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
 		model: {
 			field: 'email',
-			unique: false
+			unique: true
 		},
 		required: true
 	});
