@@ -48,7 +48,7 @@ keystone.set('routes', function(app) {
 	*
 	* **/
 	
-	greeter.init({ keystone: keystone }, false);
+	greeter.init({ keystone: keystone }, true);
 	
 	greeter.add('/greeter');
 	
