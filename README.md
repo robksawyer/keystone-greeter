@@ -14,18 +14,15 @@ npm install keystone-greeter
 
 ![screenshot](http://i.imgur.com/I0doe6el.png)
 ![screenshot](http://imgur.com/nyyUJBml.png)
-![screenshot](http://imgur.com/aYffqnXl.png)
+![screenshot](http://imgur.com/aYffqnXl.png)  
 
-You can update the controller if you want to use more than 4 registration fields.
-```javascript
-node_modules/keystone-greeter/index.js
-```
+
 The compiled client ReactJS file is located at:
 ```javascript
 node_modules/keystone_greeter/public/snowpi/js/lib/react/build/greeter.js
 ``` 
 
-The client jsx is now included at:  
+The client jsx is included at:  
 ```javascript
 node_modules/keystone_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 ``` 
