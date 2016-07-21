@@ -35,7 +35,22 @@ var greeter = require('keystone-greeter');
 
 // add the greeter in your routes file
 keystone.set('routes', function(app) {
-	greeter.init({ keystone: keystone }, true).add('/greeter');
+	
+	/**
+	* set the 2nd parameter true to add statics without using keystone.set('static').
+	* You must do this to run .init in Keystone's route setup.
+	*
+	* Set to false if you set init right sfter Keystone.init
+	* if false we grab the statics with `keystone.get('static')`
+	* convert it to an Array and push our static routes on.
+	*
+	* DEFAULT: false
+	*
+	* **/
+	
+	greeter.init({ keystone: keystone }, false);
+	
+	greeter.add('/greeter');
 	
 	// change the first login field
 	greeter.setField('login', 'text', 'A-username', {
