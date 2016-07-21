@@ -45,7 +45,7 @@ var Login = React.createClass({
 			
 		}			
 			return (<form  ref='signin'  className="signin-form"  onSubmit={this.handleSubmit} >
-				<h2>{Text.home.login} <Common.GMan /></h2>
+				<h2>{Text.home.login} </h2>
 				{this.props.flash}
 					
 					<Common.Form inputs={Text.login} context={this} />
@@ -98,7 +98,6 @@ var Login = React.createClass({
 						message();
 						_self.setState({response:yes,data:data});
 					},1000);
-					console.log(GInterval.intervals)
 					GInterval.timeout = setTimeout(function(){
 						GInterval.clearIntervals(GInterval.redirect);
 						window.location.href = data.redirect.path;
@@ -115,7 +114,6 @@ var Login = React.createClass({
 				});
 			}.bind(this),
 			error: function(xhr, status, err) {
-				console.log(err, status, err.toString());
 				this.props.context.setState({
 					response:yes,
 					data: {

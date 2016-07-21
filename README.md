@@ -1,11 +1,5 @@
 # Keystone Greeter 
-### A Keystone signin / registration form (ReactJS)
-
-Built with ReactJS (decent commenting)
-
-[Demo - styled](http://code.snowpi.org/signin) <br />
-[Demo - un-styled](http://code.snowpi.org/greeter)
-
+### A KeystoneJS signin / registration form (ReactJS)
 
 ### Install
 
@@ -14,7 +8,7 @@ npm install keystone-greeter
 
 //or add to package.json
 "dependencies": {
-	"keystone-greeter": "~0.2.x"
+	"keystone-greeter": "~0.3.1"
 }
 ```
 
@@ -38,17 +32,23 @@ node_modules/keystone_greeter/public/snowpi/js/lib/react/jsx/greeter.js
 var keystone = require('keystone');
 var greeter = require('keystone-greeter');
 
-//replace or update keystone.start()
-
-greeter.statics()
-
-keystone.start({
-	onMount: function() {
-		/* include our greeter pages
-		 * */
-		greeter.add();
-	}
+// add the greeter in your routes file
+keystone.set('routes', function(app) {
+	greeter.init({ keystone: keystone }, true).add('/greeter');
+	
+	// change the first login field
+	greeter.setField('login', 'text', 'A-username', {
+		label: 'username',
+		field: 'email',
+		//regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		model: {
+			field: 'email',
+			unique: false
+		},
+		required: true
+	});
 });
+
 
 ```
 
@@ -57,10 +57,10 @@ keystone.start({
 
 debug
 ```javascript
-greeter.set('debug',false)
+greeter.set('debug', true);
 ```
 
-##### All items need to be set before calling `greeter.add`:
+##### Most items need to be set before calling `greeter.add`:
 
 The User Model defaults to `keystone.get('user model')`. Override with:
 ```javascript
@@ -107,82 +107,129 @@ greeter.set('new user can admin', false),
 
 ```
 
-Assign the form fields to your model fields. 
+#### Default Fields
+```
+this.setField('login', 'text', 'A-username', {
+	label: Text('email'),
+	field: 'email',
+	regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+	model: {
+		field: 'email',
+		unique: false
+	},
+	required: true
+});
+this.setField('login', 'password', 'B-password', {
+	label: Text('password'),
+	field: 'password',
+	regex: ["^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$", "g"],
+	required: true
+});
+
+this.setField('register', 'text', 'A-username', {
+	label: Text('email'),
+	field: 'email',
+	regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+	required: true,
+	model: {
+		field: 'email',
+		unique: true
+	},
+});
+this.setField('register', 'password', 'B-password', {
+	label: Text('password'),
+	field: 'password',
+	required: true,
+	regex: ["^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*)[0-9a-zA-Z]{6,}$", "g"]
+});
+this.setField('register', 'password', 'C-confirm', {
+	label: Text('confirm'),
+	field: 'confirm',
+	required: true,
+	dependsOn: 'B-password' 
+});
+
+this.setField('register', 'text','D-name', {
+	label: Text('name'),
+	'field': 'name',
+	modify: ['first','last'],
+	modifyParameter: ' ',
+	placeholder: 'first last'
+});
+```
+
+#### Add or change fields  
+The order is determined by the third parameter.  
 
 The first signin form field is  **username**. We will use this to check signins.
 ```javascript
-//these are the default values
-	greeter.set('field username', 'email');
-	greeter.set('field password', 'password');
-	greeter.set('field name', ['name','first','last']);
+	greeter.setField('login', 'text', 'A-username', {
+		label: 'username',
+		field: 'email',
+		//regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		model: {
+			field: 'email',
+			unique: false
+		},
+		required: true
+	});
     
 ```
-
-There is a 4th input available if you use usernames instead of emails to login.  
-```javascript
-//this would change to using a true username
-	greeter.set('field username', 'email');
-	greeter.set('field password', 'password');
-	greeter.set('field name', ['name','first','last']);
-	greeter.set('field email', 'realEmail');
-    
-// model changes -- email to String
-email: { type: String, initial: true, required: true, index: true, label: 'username' },
-realEmail: { type: Types.Email, initial: true,  index: true, label:'email' },
-
-```
-*Notice that `label` in the field definitions keeps Keystone UI the same
 
 The **` name `** form field is a special case. 
-It can be a `String` or an `Array`.  An `Array` will be used to form a new `Object`:
+It can accept a `modify` **Array**:
 ```javascript
-greeter.set('field name', ['name','first','last'])
-
+this.setField('register', 'text','D-name', {
+	label: Text('name'),
+	'field': 'name',
+	modify: ['first','last'],
+	modifyParameter: ' ',
+	placeholder: 'first last'
+});
 ```
-wll create
+code  
 ```javascript
-var splitName = req.body.name.split(' ');
-
-... other stuff ...
-
-userDoc.name = {
-	first: 'before_first_space',
-    last:'after first space'
-}
-```
-A two element `Array` creates an object without the `split()`
-```javascript
-greeter.set('field name', ['person','name'])
-```
-wll create
-```javascript
-userDoc.person = {
-	name: req.body.name
-}
-```
-A simple string or single element `Array` are the same
-```javascript
-greeter.set('field name', ['name']);
-greeter.set('field name', 'name');
-```
-and will create
-```javascript
-userDoc.name = req.body.name
-```
-
-#### Form Text
-Change the default form labels to match your model 
-```javascript
-	greeter.set('username label','This is the login input and first register input'),
-	greeter.set('password label','Password'),
-	greeter.set('confirm label','Confirm'),
-	greeter.set('info label','Providing a valid email is the only way to reset your password.'),
-	greeter.set('name label','Full Name'),
-	greeter.set('email label','Remember this is not the login input'),
+function modify(value, modify ) {
+				
+	if(!value) return false;
+	if(!modify.modify) return false;
 	
-	//change the logo in the header
-	greeter.set('logoman','<span></span>'),
+	var save = {};									
+	var modifiers = modify.modify;
+	var modifyParameter = modify.modifyParameter || ' ';
 	
+	if(modifiers instanceof Array && modifiers.length > 1) {
+		
+		var splitName = value.split(' ');
+												
+		save[modifiers[0]] = splitName[0];
+		var cname;
+		if(splitName.length > 2) {
+			
+			for(var i=1;i<=splitName.length;i++) {
+				cname+=' ' + (splitName[i] || '');
+			}
+			
+		} else {
+			cname = splitName[1] || '';
+		}
+		save[modifiers[1]] = cname;
+	
+	} else if(modifiers instanceof Array){
+		
+		save[modifiers[0]] = req.body.name;
+		
+	} else if(typeof modifiers === 'string'){
+		
+		save[modifiers] = req.body.name;
+		
+	} else {
+		
+		save = req.body.name;
+		
+	}
+	return save;
+}
 ```
 
 #### Return Messages

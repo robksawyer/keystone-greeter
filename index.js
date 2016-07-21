@@ -48,6 +48,7 @@ var SnowGreeter = function() {
 	
 	this.set('route relay', '/greeter-keystone-relay');
 	this.set('route reset', '/greeter-reset-password');
+	this.set('route logout', '/goodbye');
 	
 	this.set('redirect timer', 0);
 	
@@ -91,7 +92,8 @@ SnowGreeter.prototype.init = function(options, statics) {
 		console.log('A Keystone instance must be included');
 		return false;
 	}
-	keystone = options.keystone;
+	
+	keystone = this.keystone = options.keystone;
 	
 	this.set('user model', keystone.get('user model') || 'User');
 	this.set('route greeter', keystone.get('signin url') || '/greeter');
@@ -330,13 +332,21 @@ SnowGreeter.prototype.statics = function() {
 	this._staticSet = true;
 }
 
+
+/** login function **/
+SnowGreeter.prototype.login = require('./lib/login.js');
+/** register function **/
+SnowGreeter.prototype.register = require('./lib/register.js');
+/** logout function **/
+SnowGreeter.prototype.goodbye = require('./lib/goodbye.js');
+
 SnowGreeter.prototype.add = function(setview) {
 	/* add the greeter routes
 	 * */
-	var app = keystone.app,
-		view = setview && setview !== undefined ? setview: this.get('route greeter'),
-		snowpi = this,
-		userModel = this.get('user model');
+	var app = keystone.app;
+	var view = setview && setview !== undefined ? setview: this.get('route greeter');
+	var snowpi = this;
+	var userModel = this.get('user model');
 	
 	/* add our static files as an additional directory
 	 * */
@@ -374,6 +384,10 @@ SnowGreeter.prototype.add = function(setview) {
 		next();
 	};
 	
+	// add a logout route (default is /goodbye)
+	app.get(this.get('route logout'), this.goodbye.bind(this));
+	
+	// main login page (default is /greeter)
 	app.get(view,
 		function(req, res) {
 			
@@ -464,8 +478,9 @@ SnowGreeter.prototype.add = function(setview) {
 				},
 			}, 
 			function(err, info) {
-				if (snowpi.get('debug') && err) console.log(err);
-				//console.log(info);
+				if (snowpi.get('debug') && err) {
+					console.log(err);
+				}
 				res.snowpiResponse({action:'greeter',command:'reset',success:'yes',message:snowpi.get('message reset email sent'),code:401,data:{}});
 			});
 		
@@ -498,163 +513,15 @@ SnowGreeter.prototype.add = function(setview) {
 						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:snowpi.get('message valid credentials'),code:401,data:{}});
 					}
 					
-					var onSuccess = function(user) {			
-						
-						return res.snowpiResponse({action:'greeter',command:'login',success:'yes',message:snowpi.get('message welcome').replace('{user}',user['full name']),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
-					}
-					
-					var onFail = function() {
-						return res.snowpiResponse({action:'greeter',command:'login',success:'no',message:snowpi.get('message valid credentials'),code:401,data:{}});
-					}
-					
-					keystone.session.signin({ email: req.body.email, password: req.body.password }, req, res, onSuccess, onFail);
+					snowpi.login(req, res);
 					
 				} else if(req.body.register === yes) { 
-					if(snowpi.get('debug'))console.log('allow register',snowpi.get('allow register'))
-					if(snowpi.get('allow register'))
-					{
-						async.series([
-							
-							function(cb) {
-								
-								if (!req.body.password || !req.body.confirm || !req.body.email) {
-									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message register all fields'),code:401,data:{}});
-								}
-								
-								if (req.body.password != req.body.confirm) {
-									return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message password match'),code:401,data:{}});
-								}
-								
-								return cb();
-								
-							},
-							
-							function(cb) {
-								if(snowpi.get('debug'))console.log('check user');
-								keystone.list(userModel).model.findOne({ email: req.body.email }, function(err, user) {
-									
-									if (err || user) {
-										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message username taken'),code:401,data:{}});
-									}
-									
-									return cb();
-									
-								});
-								
-							},
-							function(cb) {
-								if(snowpi.get('debug'))console.log('check email');
-								keystone.list(userModel).model.findOne({ realEmail: req.body.email }, function(err, user) {
-									
-									if (err || user) {
-										return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:'user exists with that email',code:401,data:{}});
-									}
-									
-									return cb();
-									
-								});	
-							},
-							
-							function(cb) {
-								if(snowpi.get('debug'))console.log('add user');
-								/* build the doc from our set variables
-								 * */
-								
-								var userData = {}
-																						
-								_.each(snowpi.get('form register'), function(v) {
-									var value = req.body[v.field];
-									if(v.modify) {
-										userData[v.field] = modify(value, v);
-									} else {
-										userData[v.field] = value;
-									}
-									
-								});
-								
-								function modify(value, modify ) {
-									
-									if(!value) return false;
-									if(!modify.modify) return false;
-									
-									var save = {};									
-									var modifiers = modify.modify;
-									var modifyParameter = modify.modifyParameter || ' ';
-									
-									if(modifiers instanceof Array && modifiers.length > 1) {
-										
-										var splitName = value.split(' ');
-																				
-										save[modifiers[0]] = splitName[0];
-										var cname;
-										if(splitName.length > 2) {
-											
-											for(var i=1;i<=splitName.length;i++) {
-												cname+=' ' + (splitName[i] || '');
-											}
-											
-										} else {
-											cname = splitName[1] || '';
-										}
-										save[modifiers[1]] = cname;
-									
-									} else if(modifiers instanceof Array){
-										
-										save[modifiers[0]] = req.body.name;
-										
-									} else if(typeof modifiers === 'string'){
-										
-										save[modifiers] = req.body.name;
-										
-									} else {
-										
-										save = req.body.name;
-										
-									}
-									return save;
-								}
-								
-								userData.isAdmin = snowpi.get('new user can admin')
-								
-								// security questions
-								var sq = snowpi.get('form reset questions');
-								if(_.isArray(sq) && sq.length > 0) {
-									userData.questions = {};
-									sq.forEach(function (val) {
-										userData.questions[val.field] = req.body[val.field + '_select']
-										userData.questions[val.answer] = req.body[val.field]
-									});
-								}
-								
-								var User = keystone.list(userModel).model;
-								var newUser = new User(userData);
-								if(snowpi.get('debug')) {
-									console.log('new user set to save',newUser,userData,req.body);
-								}
-								newUser.save(function(err) {
-									return cb(err);
-								});
-							
-							}
-							
-						], function(err){
-							
-							if (err) 
-							{
-								if(snowpi.get('debug'))console.log('user reg failed',err);
-								return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message failed register'),code:401,data:{}});
-							}
-							var onSuccess = function(user) {
-								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome').replace('{user}',user['full name']),code:200,data:{person:user},redirect:{path:keystone.get('signin redirect'),when:snowpi.get('redirect timer')}});
-							}
-							
-							var onFail = function(e) {
-								return res.snowpiResponse({action:'greeter',command:'register',success:'yes',message:snowpi.get('message welcome login'),code:401,data:{}});
-							}
-							
-							keystone.session.signin({ email: req.body.email, password: req.body.password }, req, res, onSuccess, onFail);
-							
-						});
+					if(snowpi.get('debug')) {
+						console.log('allow register', snowpi.get('allow register'));
+					}
+					if(snowpi.get('allow register')) {
+						snowpi.register(req, res);
+						
 					} else {
 						return res.snowpiResponse({action:'greeter',command:'register',success:'no',message:snowpi.get('message registration closed'),code:401,data:{}});
 					}
@@ -672,6 +539,7 @@ SnowGreeter.prototype.add = function(setview) {
 	); //end app.post
 	
 }
+
 SnowGreeter.prototype._locals = function(req, res) {
 	var root = {
 		name: keystone.get('name'),
