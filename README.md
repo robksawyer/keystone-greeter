@@ -8,9 +8,13 @@ npm install keystone-greeter
 
 //or add to package.json
 "dependencies": {
-	"keystone-greeter": "~0.3.1"
+	"keystone-greeter": "~0.3.2"
 }
 ```
+
+![screenshot](http://i.imgur.com/I0doe6el.png)
+![screenshot](http://imgur.com/nyyUJBml.png)
+![screenshot](http://imgur.com/aYffqnXl.png)
 
 You can update the controller if you want to use more than 4 registration fields.
 ```javascript
@@ -165,19 +169,27 @@ The first signin form field is  **username**. We will use this to check signins.
 ```javascript
 	greeter.setField('login', 'text', 'A-username', {
 		label: 'username',
-		field: 'email',
+		field: 'username',
 		//regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
 		model: {
 			field: 'email',
-			unique: false
 		},
 		required: true
+	});
+	greeter.setField('register', 'text', 'A-username', {
+		label: 'username',
+		field: 'username',
+		//regex: ["^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$", "gi"],
+		required: true,
+		model: {
+			field: 'email',
+			unique: true
+		},
 	});
     
 ```
 
-The **` name `** form field is a special case. 
-It can accept a `modify` **Array**:
+It can accept a `modify` **Array** to split a text field into an **Object** for registration:
 ```javascript
 this.setField('register', 'text','D-name', {
 	label: Text('name'),
@@ -245,3 +257,4 @@ Change the return message contents
 	greeter.set('message failed register', 'there was a problem creating your new account.');
 	greeter.set('message register all fields', 'please fill in username, password and password again...');
 ```
+
