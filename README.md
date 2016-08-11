@@ -266,16 +266,6 @@ function modify(value, modify ) {
 #### Return Messages  
 Change the return message contents  
   
-This will overwrite the built in i18n locales text.  To continue using locales do something similiar:  
-```javascript 
-var Text = i18n.__;
-i18n.configure({
-	locales:['en'],
-	directory: __dirname + '/locales'
-});
-greeter.set('message valid credentials', Text('a valid username and password are required'));
-```  
-
 ```javascript
 	greeter.set('message valid credentials', 'a valid username and password are required');
 	greeter.set('message welcome', 'Welcome back {user}. ');
@@ -288,3 +278,12 @@ greeter.set('message valid credentials', Text('a valid username and password are
 	greeter.set('message register all fields', 'please fill in username, password and password again...');
 ```
 
+**This will overwrite the built in i18n locales text.  To continue using locales do something similiar:**  
+```javascript 
+var Text = i18n.__;
+i18n.configure({
+	locales:['en'],
+	directory: __dirname + '/locales'
+});
+greeter.set('message valid credentials', Text('a valid username and password are required'));
+```  
