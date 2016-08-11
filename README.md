@@ -131,7 +131,7 @@ greeter.set('new user can admin', false),
 ```
 
 #### Default Fields
-```
+```javascript
 this.setField('login', 'text', 'A-username', {
 	label: Text('email'),
 	field: 'email',
