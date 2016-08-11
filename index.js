@@ -59,7 +59,7 @@ var SnowGreeter = function() {
 	
 	this._formDefaults();
 	
-	this.setButton({
+	this.setButtons({
 		login: Text('login'),
 		logincurrent: Text('current user?'),
 		register: Text('register new account'),
@@ -177,7 +177,7 @@ SnowGreeter.prototype.formDefaults = function() {
 		'field': 'name',
 		modify: ['first','last'],
 		modifyParameter: ' ',
-		placeholder: 'first last'
+		placeholder: Text('first last')
 	});
 	
 	if(this.get('register security')) {
@@ -296,10 +296,10 @@ SnowGreeter.prototype.setMessage = function(field, message) {
 		this.set('message ' + field,message);
 	}
 }
-SnowGreeter.prototype.setButton = function(button, text) {
+SnowGreeter.prototype.setButtons = function(button, text) {
 	if(_.isObject(button)) {
 		_.each(button,function(v,k) {
-			this.setButton(k, v);
+			this.setButtons(k, v);
 		},this);
 	} else if(_.isString(button) && _.isString(text)) {
 		var current = this.get('form buttons');
@@ -311,7 +311,7 @@ SnowGreeter.prototype.setButton = function(button, text) {
 SnowGreeter.prototype._emailDefaults = function() {
 	
 	this.set('emails from name', keystone.get('name'));
-	this.set('emails from email', 'info@inquisive.com');
+	this.set('emails from email', 'greeter@inquisive.com');
 	this.set('emails reset subject', Text('Reset password request from %s', keystone.get('name')));
 	this.set('emails template', '<div>A request has been made to reset your password on ' + keystone.get('name') + '.</div> <div> If this is an error ignore this email.</div><div><br /><a href="{link}">Visit this link to reset your password.</a></div>');
 }
@@ -387,8 +387,16 @@ SnowGreeter.prototype.add = function(setview) {
 	// add a logout route (default is /goodbye)
 	app.get(this.get('route logout'), this.goodbye.bind(this));
 	
+	app.get('/greeter__/greeterformfields.js/:page', function(req,res) {
+		var text = JSON.stringify(snowpi._locals(req, res));
+		var tv = keystone.security.csrf.getToken(req, res);
+		var send = "var isMe = '"+ tv + "';var isKey = '" + keystone.security.csrf.TOKEN_KEY + "';var initialPage = '" + req.params.page + "';var Text = " + text;
+		res.setHeader('content-type', 'application/javascript');
+		res.send(send);
+	});
+	
 	// main login page (default is /greeter)
-	app.get(view,
+	app.get([view, `${view}/:page`],
 		function(req, res) {
 			
 			if (req.user) {
@@ -411,7 +419,12 @@ SnowGreeter.prototype.add = function(setview) {
 				? templateCache[view] || (templateCache[view] = compileTemplate())
 				: compileTemplate();
 			
+			var text = JSON.stringify(snowpi._locals(req, res));
+			var tv = keystone.security.csrf.getToken(req, res);
+			
 			var locals = {
+				view: view,
+				page: req.params.page || 'login',
 				env: keystone.get('env'),
 				brand: keystone.get('name'),
 				logoman: snowpi.get('logoman'),
@@ -423,9 +436,10 @@ SnowGreeter.prototype.add = function(setview) {
 				section: {},
 				title: keystone.get('brand'),
 				csrf_token_key: keystone.security.csrf.TOKEN_KEY,
-				csrf_token_value: keystone.security.csrf.getToken(req, res),
+				csrf_token_value: tv,
 				//csrf_query: '&' + keystone.security.csrf.TOKEN_KEY + '=' + keystone.security.csrf.getToken(req, res),
-				text: JSON.stringify(snowpi._locals(req, res))
+				text: text,
+				userscript: "var isMe = '"+ tv + "';var isKey = '" + keystone.security.csrf.TOKEN_KEY + "';var initialPage = '" + req.params.page + "';var Text = " + text
 			};
 	
 			// Render the view

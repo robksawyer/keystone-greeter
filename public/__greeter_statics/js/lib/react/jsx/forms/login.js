@@ -1,5 +1,5 @@
 var React = require('react');
-var Text = JSON.parse(require('text'));
+//var Text = JSON.parse(require('text'));
 var Common = require('../common.js');
 var GInterval = Common.GInterval;
 var GFlash = require('../flash');
@@ -7,7 +7,6 @@ var _ = require('lodash');
 var ReactBootstrap = require('react-bootstrap');
 var BootstrapButton = ReactBootstrap.Button;
 var yes = 'yes', no = 'no';
-//var yes = true, no = false;
 
 var Login = React.createClass({
 	mixins: [React.addons.LinkedStateMixin],
@@ -20,15 +19,22 @@ var Login = React.createClass({
 	setFormState: function(valid) {
 		var ret = Common.setFormState(Text.login, valid);
 		ret.name = 'login';
+		ret.working: false;
 		return ret; 
 	},
 	handleSubmit: function(e) {
-		return e.preventDefault();
+		e.preventDefault();
+		
+		if(Common.showButton(this.state.valid) === false) {
+			this.login();
+		}
 	},
 	onChange: function(e) {
 		Common.FormInputOnChange.call(this, e, Text.login);
 	},
 	render: function() {
+		
+		var haserror = '';
 		/* if response state is yes we have a flash message to show
 		 * the message is in data
 		 * */
@@ -39,35 +45,41 @@ var Login = React.createClass({
 			showflashmessage = <GFlash showclass={pickclass} cleartimeouts={[GInterval.timeout]} clearintervals={[GInterval.redirect]}><div dangerouslySetInnerHTML={{__html: this.state.data.message || ''}} /></GFlash >;
 			
 			/* if we have an error shake the form.  this is done with the
-			 * has-errors class
+			 * has-errors class 
 			 * */
+			 
 			if(this.state.data.success === no) haserror = ' has-errors';
 			
 		}			
-			return (<form  ref='signin'  className="signin-form"  onSubmit={this.handleSubmit} >
+			return (<form  ref='signin'  className={"signin-form " + haserror}  onSubmit={this.handleSubmit} >
 				<h2>{Text.home.login} </h2>
 				{this.props.flash}
 					
-					<Common.Form inputs={Text.login} context={this} />
-					
-					<div className="clearfix" ><br /></div>
-					
-					<div className="col-xs-6 "  ><BootstrapButton role="button" onClick={this.login}  bsStyle='info' disabled={Common.showButton(this.state.valid)}>  {Text.btns.login} </BootstrapButton></div> 
-					
-					<div className="col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton onClick={this.props.showregister}  bsStyle='warning'>  {Text.btns.register} </BootstrapButton></div> 
-					
-					<div className="clearfix" ><br /></div>
-					
-					<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right', paddingTop:10}} ><BootstrapButton role="button" onClick={this.props.changeReset}  bsStyle='default' >  {Text.btns.reset} </BootstrapButton></div> 
-					
-					<div className="clearfix" ></div>
+				<Common.Form inputs={Text.login} context={this} />
+				
+				<div className="clearfix" ><br /></div>
+				
+				<div className="col-xs-6 " style={position: 'relative'} >
+					<Common.Working enabled={!Common.showButton(this.state.valid)} />
+					<input type="submit" onClick={this.login} value={Text.btns.login} className='btn btn-info' disabled={Common.showButton(this.state.valid)} />
+				</div> 
+				
+				<div className="col-xs-6 " style={{textAlign:'right'}} ><BootstrapButton onClick={this.props.showregister}  bsStyle='warning'>  {Text.btns.register} </BootstrapButton></div> 
+				
+				<div className="clearfix" ><br /></div>
+				
+				<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right', paddingTop:10}} ><BootstrapButton role="button" onClick={this.props.changeReset}  bsStyle='default' >  {Text.btns.reset} </BootstrapButton></div> 
+				
+				<div className="clearfix" ></div>
+				
 			</form>);
 			
 	},
 	login: function() {
-		/* same as register but less info sent
-		 * you could combine them both if you like less code
-		 * */
+	
+		this.setState({
+			 working: true
+		});
 		var mydata = {login:'yes'};
 		//console.log('form', this.state.form, Text.login );
 		_.each(this.state.form, function(v,k) {
@@ -96,7 +108,7 @@ var Login = React.createClass({
 						_self = this.props.context;
 					GInterval.redirect = GInterval.setInterval(function() {
 						message();
-						_self.setState({response:yes,data:data});
+						_self.setState({ response:yes, data:data });
 					},1000);
 					GInterval.timeout = setTimeout(function(){
 						GInterval.clearIntervals(GInterval.redirect);

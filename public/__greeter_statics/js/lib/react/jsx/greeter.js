@@ -7,7 +7,7 @@ var ResetCode = require('./forms/code');
 var GFlash = require('./flash');
 var Common = require('./common.js');
 var GInterval = Common.GInterval;
-var Text = JSON.parse(require('text'));
+//var Text = JSON.parse(require('text'));
 
 /**
  * use yes for true
@@ -39,7 +39,9 @@ var GLogin = React.createClass({
 		 * error messages are in data
 		 * */
 		return {
-			register: no,
+			register: window.initialPage === 'register' ? yes : no,
+			resetcode: window.initialPage === 'resetcode' ? yes : no,
+			resetform: window.initialPage === 'reset-password' || window.initialPage === 'reset' ? yes : no,
 			mounted: no, 
 			response: no, 
 			data:{}
@@ -58,7 +60,7 @@ var GLogin = React.createClass({
 	render: function() {
 		var showflashmessage = false;
 		var haserror = false;
-		var loginORregister = (this.state.register === yes) ? 'register' : 'login';
+		var loginORregister = (this.state.register === yes || window.initialPage === 'register' ) ? 'register' : 'login';
 		/* if response state is yes we have a flash message to show
 		 * the message is in data
 		 * */
@@ -74,7 +76,6 @@ var GLogin = React.createClass({
 			if(this.state.data.success === no) haserror = ' has-errors';
 			
 		}
-		
 		if(this.state.resetcode === yes) {
 			var ret = <ResetCode  context={this} changeReset={this.changeCode} flash={showflashmessage} />
 		} else if(this.state.resetform === yes) {
@@ -98,7 +99,9 @@ var GLogin = React.createClass({
 		 * */
 		this.setState({
 			register: this.state.register === yes ? no : yes,
-			response: no
+			response: no,
+			resetform: no,
+			resetcode: no,
 		});
 		return e.preventDefault();
 	},
@@ -107,6 +110,8 @@ var GLogin = React.createClass({
 		 * */
 		this.setState({
 			resetform: this.state.resetform === yes ? no : yes,
+			register: no,
+			resetcode: no,
 			response: no
 		});
 		return e.preventDefault();
@@ -116,7 +121,9 @@ var GLogin = React.createClass({
 		 * */
 		this.setState({ 
 			resetcode: this.state.resetcode === yes ?no : yes,
-			response:no
+			response:no,
+			register: no,
+			resetform: no,
 		});
 		return e.preventDefault();
 	},

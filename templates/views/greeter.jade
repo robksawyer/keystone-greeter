@@ -6,24 +6,20 @@ html
 		meta(name="viewport", content="width=device-width, initial-scale=1.0")
 		meta(http-equiv="X-UA-Compatible" content="IE=edge")
 
-		title= title || 'snowpi'
+		title= title || 'greeter'
 		link(rel="shortcut icon", href="/favicon.ico", type="image/x-icon")
 
 		if(greeterStyle)
-			link(href="/snowpi/styles/site.min.css", rel="stylesheet")
+			link(href="/__greeter_statics/styles/site.min.css", rel="stylesheet")
 		
 		if(keystoneStyle)
 			link(href="/styles/site.min.css", rel="stylesheet")
 		
 		if(customStyle)
 			link(href="#{customStyle}", rel="stylesheet")
-			
-		//- This file provides the default styling for the KeystoneJS Content Editor
-		if user && user.canAccessKeystone
-			link(href="/keystone/styles/content/editor.min.css", rel="stylesheet")
+
 		block css
 
-		//- Add any other template-specific HEAD tags by extending the head block
 		block head
 		
 	//- HTML BODY
@@ -31,7 +27,6 @@ html
 		#snowpi
 	
 		//- JAVASCRIPT
-		script(src='/snowpi/js/vendor.js')
-		script.
-			var isMe = '#{csrf_token_value}';var isKey = '#{csrf_token_key}';var Text = !{JSON.stringify(text)}
-		script(src='/snowpi/js/client.js')
+		script(src='/__greeter_statics/js/vendor.js')
+		script(src='/greeter__/greeterformfields.js/#{page}')
+		script(src='/__greeter_statics/js/client.js')

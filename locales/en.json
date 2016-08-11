@@ -29,5 +29,6 @@
 	"Reset password request from %s": "Reset password request from %s",
 	"reset passwords": "reset passwords",
 	"apply reset code": "apply reset code",
-	"confirm": "confirm"
+	"confirm": "confirm",
+	"first last": "first last"
 }

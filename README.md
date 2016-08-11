@@ -71,6 +71,14 @@ keystone.set('routes', function(app) {
 
 ### Configuration
 
+#### Locales  
+The locales file will be created on first run.  You can create additional locales without them being overwritten.  Copy the `en.json` file and replace the values.
+```javascript
+node_modules/keystone_greeter/locales
+-- node_modules/keystone_greeter/locales/en.json
+``` 
+
+#### Debugging
 debug
 ```javascript
 greeter.set('debug', true);

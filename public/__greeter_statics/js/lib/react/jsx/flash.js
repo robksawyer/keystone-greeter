@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-
+var GInterval = require('./common.js').GInterval;
 /* create flash message 
  * */
 var Flash = ReactBootstrap.Alert;

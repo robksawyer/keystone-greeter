@@ -1,5 +1,5 @@
 var React = require('react');
-var Text = JSON.parse(require('text'));
+//var Text = JSON.parse(require('text'));
 var Common = require('../common.js');
 var GInterval = Common.GInterval;
 var _ = require('lodash');
@@ -22,7 +22,10 @@ var RR = React.createClass({
 		return ret;
 	},
 	handleSubmit: function(e) {
-		return e.preventDefault();
+		e.preventDefault();
+		if(Common.showButton(this.state.valid) === false) {
+			this.register();
+		}
 	},
 	onChange: function(e) {
 		Common.FormInputOnChange.call(this, e, Text.register);

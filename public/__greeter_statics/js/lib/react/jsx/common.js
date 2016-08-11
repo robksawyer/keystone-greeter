@@ -1,5 +1,5 @@
 var React = require('react');
-var Text = JSON.parse(require('text'));
+//var Text = JSON.parse(require('text'));
 var _ = require('lodash');
 
 /* man component
@@ -78,7 +78,7 @@ module.exports.Form = React.createClass({
 		var _this = this;
 		var form = [];
 		// sort out object of form elements and add them to an array
-		console.log(this.props.inputs);
+		//console.log(this.props.inputs);
 		var sorted_list = _(this.props.inputs).keys().sort().map(function (key) {
 			var value = _this.props.inputs[key];
 			form.push(container(key, value, _this.props.inputs, _this.props.context));
