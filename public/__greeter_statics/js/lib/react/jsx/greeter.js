@@ -40,7 +40,7 @@ var GLogin = React.createClass({
 		 * */
 		return {
 			register: window.initialPage === 'register' ? yes : no,
-			resetcode: window.initialPage === 'resetcode' ? yes : no,
+			resetcode: window.initialPage === 'reset-code' ? yes : no,
 			resetform: window.initialPage === 'reset-password' || window.initialPage === 'reset' ? yes : no,
 			mounted: no, 
 			response: no, 
