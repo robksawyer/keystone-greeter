@@ -396,7 +396,7 @@ SnowGreeter.prototype.add = function(setview) {
 	});
 	
 	// main login page (default is /greeter)
-	app.get([view, `${view}/:page`],
+	app.get([view, `${view}/:page`, `${view}/:page/:code`],
 		function(req, res) {
 			
 			if (req.user) {
@@ -421,10 +421,12 @@ SnowGreeter.prototype.add = function(setview) {
 			
 			var text = JSON.stringify(snowpi._locals(req, res));
 			var tv = keystone.security.csrf.getToken(req, res);
-			
+			var page = req.params.page != 'undefined' && req.params.page ? req.params.page : 'login';
+			var code = req.params.code != 'undefined' && req.params.code ? req.params.code : false;
 			var locals = {
 				view: view,
-				page: req.params.page || 'login',
+				page: page,
+				code: code,
 				env: keystone.get('env'),
 				brand: keystone.get('name'),
 				logoman: snowpi.get('logoman'),

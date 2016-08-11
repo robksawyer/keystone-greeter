@@ -1,6 +1,6 @@
 {
   "name": "keystone-greeter",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": false,
   "description": "Stand-alone signin and registration module for Keystone; built with ReactJS",
   "main": "index.js",

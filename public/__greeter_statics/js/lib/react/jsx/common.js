@@ -2,6 +2,26 @@ var React = require('react');
 //var Text = JSON.parse(require('text'));
 var _ = require('lodash');
 
+var Working = React.createClass({
+	getDefaultProps: function() {
+		return ({
+			divstyle:{
+				width: 0,
+				height: '100%',
+			},
+			enabled: false
+		});
+	},
+	
+	render: function() {
+	    return (
+		<div style={this.props.divstyle}  />
+	    );
+	}
+});
+
+module.exports.Working = Working;
+
 /* man component
  * simple example
  * */

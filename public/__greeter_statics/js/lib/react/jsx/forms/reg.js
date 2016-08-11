@@ -19,6 +19,7 @@ var RR = React.createClass({
 	setFormState: function(valid) {
 		var ret = Common.setFormState(Text.register, valid);
 		ret.name = 'register';
+		ret.working =  false;
 		return ret;
 	},
 	handleSubmit: function(e) {
@@ -39,7 +40,10 @@ var RR = React.createClass({
 					
 					<div className="clearfix" ><br /></div>
 					
-					<div className="col-xs-6 " style={{textAlign:'left'}} ><BootstrapButton onClick={this.register} ref="registerbutton" data-loading-text="Registering..." role="button"  bsStyle='warning' className="btn  btn-warning"  disabled={Common.showButton(this.state.valid)}>  {Text.btns.register} </BootstrapButton></div> 
+					<div className="col-xs-6 " style={{position: 'relative'}} >
+					<Common.Working enabled={!Common.showButton(this.state.valid)} />
+					<input type="submit" onClick={this.register} ref="registerbutton" value={Text.btns.register} className='btn btn-warning' disabled={Common.showButton(this.state.valid)} />
+				</div> 
 					
 					<div className="col-xs-6 "   style={{textAlign:'right'}} ><BootstrapButton role="button" onClick={this.props.showregister}  className="btn btn-default">  {Text.btns.logincurrent} </BootstrapButton></div>
 					<div className="clearfix" ></div>
@@ -50,7 +54,12 @@ var RR = React.createClass({
 		 * this method should only be avialable if
 		 * all validation is already met so just run
 		 * */
-		console.log('form', this.state.form, 'Text', Text.register ); 
+		
+		this.setState({
+			 working: true
+		});
+		
+		//console.log('form', this.state.form, 'Text', Text.register ); 
 		var mydata = { register: 'yes' };
 		_.each(this.state.form, function(v,k) {
 			if(v.type !== 'header') {
@@ -60,8 +69,8 @@ var RR = React.createClass({
 		},this); 
 		mydata[isKey] = isMe;
 		console.log('mydata', mydata, 'Text', Text.register );
-		var btn = $(this.refs.registerbutton.getDOMNode())
-		btn.button('loading')
+		//var btn = $(this.refs.registerbutton.getDOMNode())
+		//btn.button('loading')
 		$.ajax({
 			url: Text.relay,
 			dataType: 'json',
@@ -135,7 +144,7 @@ var RR = React.createClass({
 		* */	
 		}).always(function () {
 			
-			btn.button('reset');
+			//btn.button('reset');
 		});
 		
 	},

@@ -14,7 +14,7 @@ gulp.task('scripts', function() {
       literalify = require('literalify'),
       rename = require('gulp-rename')
 
-  return gulp.src('public/snowpi/js/lib/react/jsx/app.js')
+  return gulp.src('public/__greeter_statics/js/lib/react/jsx/app.js')
     .pipe(browserify({
       debug: true,
       extensions: ['.jsx', '.js', '.json'],
@@ -30,7 +30,7 @@ gulp.task('scripts', function() {
       gutil.log(err.message)
     })
     .pipe(rename('client.js'))
-    .pipe(gulp.dest('public/snowpi/js'))
+    .pipe(gulp.dest('public/__greeter_statics/js'))
 })
 
 /* Styles
@@ -52,14 +52,14 @@ gulp.task('vendor', function() {
   var concat = require('gulp-concat')
 
   gulp.src([
-		'public/snowpi/js/lib/jquery/jquery-2.1.1.min.js',
-		'public/snowpi/js/lib/bootstrap/bootstrap-3.2.0.min.js',
-		'public/snowpi/js/lib/bower_components/react/react-with-addons.js',
-		'public/snowpi/js/lib/bower_components/lodash/lodash.js',
-		'public/snowpi/js/lib/bower_components/react-bootstrap/react-bootstrap.js',
+		'public/__greeter_statics/js/lib/jquery/jquery-2.1.1.min.js',
+		'public/__greeter_statics/js/lib/bootstrap/bootstrap-3.2.0.min.js',
+		'public/__greeter_statics/js/lib/bower_components/react/react-with-addons.js',
+		'public/__greeter_statics/js/lib/bower_components/lodash/lodash.js',
+		'public/__greeter_statics/js/lib/bower_components/react-bootstrap/react-bootstrap.js',
     ])
     .pipe(concat('vendor.js'))
-    .pipe(gulp.dest('public/snowpi/js'))
+    .pipe(gulp.dest('public/__greeter_statics/js'))
 })
 
 /* Webserver w/LiveReload
@@ -91,8 +91,8 @@ gulp.task('serve', ['default', 'watch'], function() {
 */
 // Watch
 gulp.task('watch', function() {
-  gulp.watch('public/snowpi/js/lib/react/jsx/**', ['scripts'])
-  gulp.watch('public/snowpi/js/lib/bower_components/**', ['vendor'])
+  gulp.watch('public/__greeter_statics/js/lib/react/jsx/**', ['scripts'])
+  gulp.watch('public/__greeter_statics/js/lib/bower_components/**', ['vendor'])
 })
 
 gulp.task('default', [ 'scripts', 'vendor'])

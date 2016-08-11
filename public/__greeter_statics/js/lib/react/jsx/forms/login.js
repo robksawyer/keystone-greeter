@@ -19,12 +19,11 @@ var Login = React.createClass({
 	setFormState: function(valid) {
 		var ret = Common.setFormState(Text.login, valid);
 		ret.name = 'login';
-		ret.working: false;
+		ret.working =  false;
 		return ret; 
 	},
 	handleSubmit: function(e) {
 		e.preventDefault();
-		
 		if(Common.showButton(this.state.valid) === false) {
 			this.login();
 		}
@@ -32,7 +31,7 @@ var Login = React.createClass({
 	onChange: function(e) {
 		Common.FormInputOnChange.call(this, e, Text.login);
 	},
-	render: function() {
+	render: function() { 
 		
 		var haserror = '';
 		/* if response state is yes we have a flash message to show
@@ -59,7 +58,7 @@ var Login = React.createClass({
 				
 				<div className="clearfix" ><br /></div>
 				
-				<div className="col-xs-6 " style={position: 'relative'} >
+				<div className="col-xs-6 " style={{position: 'relative'}} >
 					<Common.Working enabled={!Common.showButton(this.state.valid)} />
 					<input type="submit" onClick={this.login} value={Text.btns.login} className='btn btn-info' disabled={Common.showButton(this.state.valid)} />
 				</div> 
@@ -68,7 +67,7 @@ var Login = React.createClass({
 				
 				<div className="clearfix" ><br /></div>
 				
-				<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right', paddingTop:10}} ><BootstrapButton role="button" onClick={this.props.changeReset}  bsStyle='default' >  {Text.btns.reset} </BootstrapButton></div> 
+				<div className="col-xs-offset-6 col-xs-6 " style={{textAlign:'right', paddingTop:10, display: 'none'}} ><BootstrapButton role="button" onClick={this.props.changeReset}  bsStyle='default' >  {Text.btns.reset} </BootstrapButton></div> 
 				
 				<div className="clearfix" ></div>
 				

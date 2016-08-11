@@ -17,6 +17,7 @@ var ResetPassword = React.createClass({
 	setFormState: function(valid) {
 		var ret = Common.setFormState(Text.resetcode, valid);
 		ret.name = 'reset';
+		ret.resetcode = document.getElementById('G__resetcode__G').value;
 		return ret;
 	},
 	handleSubmit: function(e) {
