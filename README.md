@@ -8,7 +8,7 @@ npm install keystone-greeter
 
 //or add to package.json
 "dependencies": {
-	"keystone-greeter": "~0.3.2"
+	"keystone-greeter": "~0.3.3"
 }
 ```
 
